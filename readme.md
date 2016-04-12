@@ -1,2 +1,2 @@
-# Cucco Figth!
+# Cucco Fighting!
 ITBA - Sistemas Operativos - TPE

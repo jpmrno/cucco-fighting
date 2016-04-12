@@ -8,9 +8,9 @@ Persona q no tiene cuccos, apuesta por el listado de cuccos
 - **list:** lista de cuccos
 - **bet cucco money:** apuesta a cucco, con tanta plata
 - **bet -n # money:** apuesta a cucco numero #, con tanta plata
-- **cashup:** cierra la coneccion con el servidor y termina el proceso
+- **cashup:** cierra la conexion con el servidor y termina el proceso
 - **money/wallet:** muestra la cant. de dinero disponible
-- **caching:** reinicia la cantidad de dinero
+- **kaching:** reinicia la cantidad de dinero
 
 ### Todos/Consultas:
 
@@ -21,11 +21,11 @@ Persona q no tiene cuccos, apuesta por el listado de cuccos
 
 ### Comandos:
 
-- **lscuccos:** lista de cuccos
-- **mkcucco name:** añade un cucco
-- **rmcucco name:** remueve un cucco
-- **lsclients:** lista de clientes con todos sus datos
-- **rmclient name:** cierra la coneccion con el cliente (name)
+- **cuccos:** lista de cuccos
+- **cuccos add name:** añade un cucco
+- **cuccos remove name:** remueve un cucco
+- **clients:** lista de clientes con todos sus datos
+- **clients remove name:** cierra la conexion con el cliente (name)
 - **figth:** comienza la pelea
 
 ### Todos/Consultas:

@@ -1,3 +1,7 @@
+#
+# Githubs' gitignore
+#
+
 # Object files
 *.o
 *.ko

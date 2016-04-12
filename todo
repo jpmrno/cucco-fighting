@@ -1,0 +1,16 @@
+cucco_add
+cucco_remove
+
+cuando un cliente apueste (el primero en apostar) inicia el timer para que el resto de los clientes apueste
+
+cliente: persona q no tiene cuccos, apuesta por el listado de cuccos
+cucco_list()
+cucco_bet(cucco, money)
+
+servidor:
+cucco_add(name)
+cucco_remove(name)
+alarm_clients()
+simulate_figth()
+
+c: leer alarm()

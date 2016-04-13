@@ -1,0 +1,4 @@
+GCC = gcc
+GCC_FLAGS = -pedantic -Wall -Wextra -Wno-unused-parameter -Werror -Wfatal-errors -Wno-error=pedantic
+
+SHARED_HEADERS = shared

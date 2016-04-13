@@ -1,4 +1,6 @@
-c: leer alarm()
+- c: leer alarm()
+- Poner database en gitignore?
+- Cambiar lugar dnd se crea la database
 
 # Cliente
 Persona q no tiene cuccos, apuesta por el listado de cuccos
@@ -24,6 +26,7 @@ Persona q no tiene cuccos, apuesta por el listado de cuccos
 - **cuccos:** lista de cuccos
 - **cuccos add name:** añade un cucco
 - **cuccos remove name:** remueve un cucco
+- **cuccos remove -n #:** remueve un cucco
 - **clients:** lista de clientes con todos sus datos
 - **clients remove name:** cierra la conexion con el cliente (name)
 - **figth:** comienza la pelea

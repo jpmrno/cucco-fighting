@@ -94,6 +94,58 @@ int database_cuccos_list() {
 	return ret;
 }
 
+int database_clients_add(char * name) {
+	// http://stackoverflow.com/questions/2942370/how-to-insert-any-string-in-sqlite3-in-c
+	char * sql = sqlite3_mprintf("INSERT OR IGNORE INTO Clients(Name) VALUES('%q')", name);
+	int ret = database_sql(sql, NULL);
+
+	sqlite3_free(sql);
+
+	return ret;
+}
+
+int database_clients_get(char * name) {
+	char * sql = sqlite3_mprintf("SELECT ID, Name, Money FROM Clients WHERE Name = '%q'", name);
+	int ret = database_sql(sql, callback);
+
+	sqlite3_free(sql);
+
+	return ret;
+}
+
+int database_clients_getn(int number) {
+	char * sql = sqlite3_mprintf("SELECT ID, Name, Money FROM Clients WHERE ID = %d", number);
+	int ret = database_sql(sql, callback);
+
+	sqlite3_free(sql);
+
+	return ret;
+}
+
+int database_clients_remove(char * name) {
+	char * sql = sqlite3_mprintf("DELETE FROM Clients WHERE Name = '%q'", name);
+	int ret = database_sql(sql, NULL);
+
+	sqlite3_free(sql);
+
+	return ret;
+}
+
+int database_clients_removen(int number) {
+	char * sql = sqlite3_mprintf("DELETE FROM Clients WHERE ID = %d", number);
+	int ret = database_sql(sql, NULL);
+
+	sqlite3_free(sql);
+
+	return ret;
+}
+
+int database_clients_list() {
+	int ret = database_sql("SELECT * FROM Clients", callback);
+
+	return ret;
+}
+
 static int database_sql(char * sql, callback_t callback) {
 	char * error;
 

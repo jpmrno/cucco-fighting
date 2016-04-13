@@ -29,7 +29,7 @@ Persona q no tiene cuccos, apuesta por el listado de cuccos
 - **cuccos remove -n #:** remueve un cucco
 - **clients:** lista de clientes con todos sus datos
 - **clients remove name:** cierra la conexion con el cliente (name)
-- **figth:** comienza la pelea
+- **fight:** comienza la pelea
 
 ### Todos/Consultas:
 

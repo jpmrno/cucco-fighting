@@ -3,7 +3,7 @@ include ../makevars
 TARGET = server.app
 SRC_C = src
 SRC_HEADERS = include
-SRC_LIBS = sqlite3
+SRC_LIBS =
 
 SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
 OBJECTS = $(SOURCES:.c=.o)

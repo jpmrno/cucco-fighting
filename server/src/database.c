@@ -160,9 +160,10 @@ static int database_sql(char * sql, callback_t callback) {
 
 // TODO: Cambiar a q lo guarde en una estructura
 static int callback(void * notUsed, int argc, char **argv, char ** azColName) {
+	int i;
 	notUsed = NULL;
 
-	for(int i = 0; i < argc; i++) {
+	for(i = 0; i < argc; i++) {
 	    printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
 	}
 

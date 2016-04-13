@@ -1,4 +1,4 @@
 GCC = gcc
-GCC_FLAGS = -pedantic -Wall -Wextra -Wno-unused-parameter -Werror -Wfatal-errors -Wno-error=pedantic
+GCC_FLAGS = -std=c99 -pedantic -Wall -Wextra -Werror -Wfatal-errors -Wno-unused-parameter -Wno-unused-but-set-parameter -Wno-error=pedantic
 
 SHARED_HEADERS = shared

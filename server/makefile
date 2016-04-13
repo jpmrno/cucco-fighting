@@ -3,7 +3,7 @@ include ../makevars
 TARGET = server.app
 SRC_C = src
 SRC_HEADERS = include
-SRC_LIBS =
+SRC_LIBS = sqlite3
 
 SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
 OBJECTS = $(SOURCES:.c=.o)
@@ -16,7 +16,7 @@ LIBS = $(foreach LIB,$(SRC_LIBS),-l $(LIB))
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(GCC) $(GCC_FLAGS) $(HEADERS) $(LIBS) -o $@ $^
+	$(GCC) $(GCC_FLAGS) $(HEADERS) -o $@ $^ $(LIBS)
 
 %.o: %.c
 	$(GCC) $(GCC_FLAGS) $(HEADERS) -c $< -o $@

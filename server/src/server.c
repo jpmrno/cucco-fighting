@@ -11,14 +11,22 @@ int main(int argc, char const * argv[]) {
 		printf("Pude abrir/crear!\n");
 	}
 
-	if(!database_cuccos_add("Bola de Nieves II")) {
+	if(!database_clients_add("Barto")) {
 		fprintf(stderr, "No pude crear\n");
 	}
-	
-	if(!database_cuccos_list()) {
+
+	if(!database_clients_list()) {
 		fprintf(stderr, "No pude crear\n");
 	}
-	
+
+	if(!database_clients_money("Barto", -10)) {
+		fprintf(stderr, "No pude crear\n");
+	}
+
+	if(!database_clients_list()) {
+		fprintf(stderr, "No pude crear\n");
+	}
+
 	database_close();
 
 	return 0;

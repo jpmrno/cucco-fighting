@@ -61,8 +61,8 @@ int database_cuccos_get(char * name) {
 	return ret;
 }
 
-int database_cuccos_getn(int number) {
-	char * sql = sqlite3_mprintf("SELECT ID, Name FROM Cuccos WHERE ID = %d", number);
+int database_cuccos_getn(int id) {
+	char * sql = sqlite3_mprintf("SELECT ID, Name FROM Cuccos WHERE ID = %d", id);
 	int ret = database_sql(sql, callback);
 
 	sqlite3_free(sql);
@@ -79,8 +79,8 @@ int database_cuccos_remove(char * name) {
 	return ret;
 }
 
-int database_cuccos_removen(int number) {
-	char * sql = sqlite3_mprintf("DELETE FROM Cuccos WHERE ID = %d", number);
+int database_cuccos_removen(int id) {
+	char * sql = sqlite3_mprintf("DELETE FROM Cuccos WHERE ID = %d", id);
 	int ret = database_sql(sql, NULL);
 
 	sqlite3_free(sql);
@@ -113,8 +113,8 @@ int database_clients_get(char * name) {
 	return ret;
 }
 
-int database_clients_getn(int number) {
-	char * sql = sqlite3_mprintf("SELECT ID, Name, Money FROM Clients WHERE ID = %d", number);
+int database_clients_getn(int id) {
+	char * sql = sqlite3_mprintf("SELECT ID, Name, Money FROM Clients WHERE ID = %d", id);
 	int ret = database_sql(sql, callback);
 
 	sqlite3_free(sql);
@@ -131,8 +131,8 @@ int database_clients_remove(char * name) {
 	return ret;
 }
 
-int database_clients_removen(int number) {
-	char * sql = sqlite3_mprintf("DELETE FROM Clients WHERE ID = %d", number);
+int database_clients_removen(int id) {
+	char * sql = sqlite3_mprintf("DELETE FROM Clients WHERE ID = %d", id);
 	int ret = database_sql(sql, NULL);
 
 	sqlite3_free(sql);
@@ -142,6 +142,24 @@ int database_clients_removen(int number) {
 
 int database_clients_list() {
 	int ret = database_sql("SELECT * FROM Clients", callback);
+
+	return ret;
+}
+
+int database_clients_money(char * name, int money) {
+	char * sql = sqlite3_mprintf("UPDATE Clients SET Money = Money + %d WHERE NAME = '%q'", money, name);
+	int ret = database_sql(sql, callback);
+
+	sqlite3_free(sql);
+
+	return ret;
+}
+
+int database_clients_moneyn(int id, int money) {
+	char * sql = sqlite3_mprintf("UPDATE Clients SET Money = Money + %d WHERE ID = %d", money, id);
+	int ret = database_sql(sql, callback);
+
+	sqlite3_free(sql);
 
 	return ret;
 }

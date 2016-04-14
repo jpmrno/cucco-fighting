@@ -16,7 +16,7 @@ LIBS = $(foreach LIB,$(SRC_LIBS),-l $(LIB))
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(GCC) $(GCC_FLAGS) $(HEADERS) $(LIBS) -o $@ $^
+	$(GCC) $(GCC_FLAGS) $(HEADERS) -o $@ $^ $(LIBS)
 
 %.o: %.c
 	$(GCC) $(GCC_FLAGS) $(HEADERS) -c $< -o $@

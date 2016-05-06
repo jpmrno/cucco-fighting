@@ -1,33 +1,58 @@
 #include <server.h>
 #include <define.h>
-#include <database.h>
+#include <comapi.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+// #include <signal.h>
+
+// void stop(int val);
+void handle(connection_t connection);
+
+static volatile int running = TRUE;
 
 int main(int argc, char const * argv[]) {
-	if(!database_open()) {
-		fprintf(stderr, "Can't open database\n");
+	int connection_numer = 0;
+	connection_t connection_accepted;
+	connection_t connection = c_mkserver("127.0.0.1", 8080);
+	if(connection == NULL) {
+		printf("Error en la conexion!\n");
 		return 1;
-	} else {
-		printf("Pude abrir/crear!\n");
 	}
 
-	if(!database_clients_add("Barto")) {
-		fprintf(stderr, "No pude crear\n");
+	while(running) {  // main accept() loop
+		connection_accepted = c_accept(connection);
+		if(connection_accepted == NULL) {
+			printf("Error en la nueva conexion!\n");
+			return 1;
+		}
+
+		connection_numer++;
+
+		if(!fork()) { // Child process
+			c_disconnect(connection);
+
+			handle(connection_accepted);
+
+			c_disconnect(connection_accepted);
+			exit(0); // TODO: Porq no return 0?
+		}
+
+		printf("(%d) Desconectando nueva conexion...\n", connection_numer);
+		c_disconnect(connection_accepted);
 	}
 
-	if(!database_clients_list()) {
-		fprintf(stderr, "No pude crear\n");
-	}
-
-	if(!database_clients_money("Barto", -10)) {
-		fprintf(stderr, "No pude crear\n");
-	}
-
-	if(!database_clients_list()) {
-		fprintf(stderr, "No pude crear\n");
-	}
-
-	database_close();
+	printf("Desconectando principal conexion...\n");
+	c_disconnect(connection);
 
 	return 0;
 }
+
+// void stop(int val) {
+//     running = FALSE;
+// }
+
+void handle(connection_t connection) {
+	printf("Me pude conectar!\n");
+}
+

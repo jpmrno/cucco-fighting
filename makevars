@@ -6,4 +6,12 @@ endif
 
 GCC_FLAGS = -std=c99 -pedantic -Wall -Wextra -Werror -Wno-error=pedantic -Wfatal-errors -Wno-unused-parameter -Wno-unused-but-set-parameter
 
+ifeq ($(shell uname), Darwin)
+	AR = libtool -static
+	AR_FLAGS = -o
+else
+	AR = gcc
+	AR_FLAGS = -rvs
+endif
+
 SHARED_HEADERS = shared

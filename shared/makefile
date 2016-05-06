@@ -1,22 +1,28 @@
 include ../makevars
 
+# --[ Vars ]------------------ #
+NAME = shared
 SRC_C = .
 SRC_HEADERS = .
-SRC_LIBS =
+# ---------------------------- #
+
+TARGET = lib$(NAME).a
 
 SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
 HEADERS = $(foreach HEADER,$(SRC_HEADERS),-I $(HEADER))
 
-LIBS = $(foreach LIB,$(SRC_LIBS),-l $(LIB))
+# TODO:
+all:
 
-all: $(OBJECTS)
+$(TARGET): $(OBJECTS)
+	$(AR) $(AR_FLAGS) $@ $^
 
 %.o: %.c
-	$(GCC) $(GCC_FLAGS) $(HEADERS) $(LIBS) -c $< -o $@
+	$(GCC) $(GCC_FLAGS) $(HEADERS) -c $< -o $@
 
 clean:
-	rm -f $(OBJECTS)
+	rm -f $(TARGET) $(OBJECTS)
 
 .PHONY: all clean

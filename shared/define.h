@@ -6,4 +6,8 @@
 #define TRUE !FALSE
 #define FALSE 0
 
+#define SUCCESS 0
+#define ERROR -1
+#define ERROR_OCCURRED(x) ((x) < SUCCESS)
+
 #endif

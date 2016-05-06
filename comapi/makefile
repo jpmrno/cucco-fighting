@@ -1,22 +1,29 @@
 include ../makevars
 
+# --[ Vars ]------------------ #
+NAME = comapi
 SRC_C = src
 SRC_HEADERS = include
-SRC_LIBS =
+SRC_IMPL = impl
+# ---------------------------- #
+
+TARGET = lib$(NAME).a
 
 SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
+SOURCES += $(SRC_IMPL)/$(impl).c
 OBJECTS = $(SOURCES:.c=.o)
 
 HEADERS = $(foreach HEADER,$(SRC_HEADERS),-I $(HEADER))
 
-LIBS = $(foreach LIB,$(SRC_LIBS),-l $(LIB))
+all: $(TARGET)
 
-all: $(OBJECTS)
+$(TARGET): $(OBJECTS)
+	$(AR) $(AR_FLAGS) $@ $^
 
 %.o: %.c
-	$(GCC) $(GCC_FLAGS) $(HEADERS) $(LIBS) -c $< -o $@
+	$(GCC) $(GCC_FLAGS) $(HEADERS) -c $< -o $@
 
 clean:
-	rm -f $(OBJECTS)
+	rm -f $(TARGET) $(SRC_C)/*.o $(SRC_C)/**/*.o $(SRC_IMPL)/*.o
 
 .PHONY: all clean

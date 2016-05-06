@@ -6,7 +6,10 @@ __check_defined = $(if $(value $1),, \
 
 help:
 	@echo "Cucco Fighting!'s makefile"
-	@echo "Usage: 'make [ all | build | clean | server | client | database | logger ]'"
+	@echo "Clean & Build: 'make all impl=<sockets/pipes>'"
+	@echo "Build: 'make <option> impl=<sockets/pipes>'"
+	@echo "  - Options: 'server', 'client', 'database', 'logger', 'comapi', 'shared'"
+	@echo "Clean: 'make clean'"
 
 all: clean build
 

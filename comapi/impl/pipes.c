@@ -9,7 +9,7 @@ typedef struct {
 } __attribute__((packed)) network_t;
 
 connection_t c_mkserver(char * address, ...) {
-	connection_t nconnection;
+	connection_t connection;
 	pipe_t * read;
 
 	read = pipe_make(address, FALSE);
@@ -17,31 +17,78 @@ connection_t c_mkserver(char * address, ...) {
 		return NULL;
 	}
 
-	nconnection = connection_new(read, NULL);
-	if(nconnection == NULL) {
+	connection = connection_new(read, NULL);
+	if(connection == NULL) {
 		pipe_remove(read);
 	}
 
-	return nconnection;
+	return connection;
 }
 
 connection_t c_connect(char * address, ...) {
-	open();
-	read = pipe_make();
-	write(read);
-	write = receive(read);
-	connection_make(read, write);
+	pipe_t * read, write, conector;
+	char * read_address, write_address;
+	connection_t connection;
+
+	conector = pipe_open(address, TRUE);
+	if(conector == NULL) {
+		return NULL;
+	}
+
+	read = pipe_make(read_address, FALSE);
+	if(read == NULL) {
+		pipe_remove(conector);
+		return NULL;
+	}
+
+	//pipe_send(conector, read_address);
+	//write_address = pipe_receive(read);
+
+	write = pipe_open(write_address, TRUE);
+	if(write == NULL) {
+		pipe_remove(conector);
+		pipe_remove(read);
+		return NULL;
+	}
+
+	connection = connection_make(read, write);
+	if(connection == NULL) {
+		pipe_remove(conector);
+		pipe_remove(read);
+		pipe_remove(write);
+		return NULL;
+	}
 
 	return connection;
 }
 
 connection_t c_accept(connection_t connection) {
 	network_t * network = (network_t *) connection;
+	pipe_t * read, write, conector;
+	char * read_address, write_address;
+	connection_t connection;
 
-	read = pipe_make();
-	write = receive(general);
-	send(read);
-	connection_make(read, write);
+	//write_address = pipe_receive(connection->read);
+
+	write = pipe_open(write_address, TRUE);
+	if(write == NULL) {
+		return NULL;
+	}
+
+	read = pipe_make(read_address, FALSE);
+	if(read == NULL) {
+		pipe_remove(write);
+		return NULL;
+	}
+
+	//pipe_send(write, read_address);
+
+	connection = connection_make(read, write);
+	if(connection == NULL) {
+		pipe_remove(write);
+		pipe_remove(read);
+		return NULL;
+	}
 
 	return connection;
 }

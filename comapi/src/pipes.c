@@ -61,6 +61,12 @@ void pipe_remove(pipe_t * pipe) {
 		if(pipe->owner) {
 			unlink(pipe->address);
 		}
+		pipe_close(pipe);
+	}
+}
+
+void pipe_close(pipe_t * pipe) {
+	if(pipe != NULL) {
 		close(pipe->channel);
 		free(pipe->address);
 		free(pipe);

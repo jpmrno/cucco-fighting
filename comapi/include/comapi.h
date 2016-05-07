@@ -34,10 +34,12 @@ typedef struct network_t * connection_t;
 // 	arg_t * vars;
 // } __attribute__((packed)) args_t;
 
-connection_t c_mkserver(char * address, ...);
-connection_t c_connect(char * address, ...);
-void c_disconnect(connection_t connection);
-connection_t c_accept(connection_t connection);
+connection_t server_start();
+void server_stop(connection_t connection);
+connection_t server_incoming(connection_t connection);
+
+connection_t server_connect();
+void server_disconnect(connection_t connection);
 
 // int send(connection_t connection, data_t * data);
 // int receive(connection_t connection, data_t * data);

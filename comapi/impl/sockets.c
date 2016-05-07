@@ -1,13 +1,14 @@
 #include <comapi.h>
 #include <define.h>
 #include <sys/socket.h>
-#include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdarg.h>
 #include <string.h>
+#include <strings.h>
 
 // http://www.beej.us/guide/bgnet/output/html/singlepage/bgnet.html
 

@@ -15,7 +15,7 @@ int main(int argc, char const * argv[]) {
 	int connection_numer = 0;
 	connection_t connection_accepted;
 
-	connection_t connection = c_mkserver("/tmp/server");
+	connection_t connection = c_mkserver("127.0.0.1", 8080);
 	if(connection == NULL) {
 		printf("Error en la conexion!\n");
 		return 1;

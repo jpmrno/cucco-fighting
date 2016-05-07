@@ -14,6 +14,7 @@ static volatile int running = TRUE;
 int main(int argc, char const * argv[]) {
 	int connection_numer = 0;
 	connection_t connection_accepted;
+
 	connection_t connection = c_mkserver("/tmp/server");
 	if(connection == NULL) {
 		printf("Error en la conexion!\n");
@@ -31,7 +32,6 @@ int main(int argc, char const * argv[]) {
 
 		if(!fork()) { // Child process
 			//c_disconnect(connection);
-
 			handle(connection_accepted);
 
 			c_disconnect(connection_accepted);
@@ -54,5 +54,7 @@ int main(int argc, char const * argv[]) {
 
 void handle(connection_t connection) {
 	printf("Me pude conectar!\n");
+	sleep(10);
+	printf("Termine con el cliente!\n");
 }
 

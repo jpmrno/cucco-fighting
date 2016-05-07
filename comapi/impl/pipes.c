@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <random.h>
+
+#define PIPE_NAME_SIZE 11
+#define PIPE_DIR_SIZE 5
+#define PIPE_PATH_SIZE (PIPE_DIR_SIZE + PIPE_NAME_SIZE)
 
 typedef struct {
 	pipe_t * read;
@@ -13,12 +18,14 @@ typedef struct {
 
 static connection_t connection_new(pipe_t * read, pipe_t * write);
 static void connection_free(connection_t connection);
+
 static void randstr(char *s, const int len);
 
 connection_t c_mkserver(char * address, ...) {
-	srand(time(NULL));
 	connection_t connection;
 	pipe_t * read;
+
+	pcg32_srandom(time(NULL), (intptr_t)&read);
 
 	read = pipe_make(address, FALSE);
 	if(read == NULL) {
@@ -33,12 +40,13 @@ connection_t c_mkserver(char * address, ...) {
 	return connection;
 }
 
-#define PIPENAME_SIZE 11
 connection_t c_connect(char * address, ...) {
-	srand(time(NULL));
 	pipe_t * read, * write, * conector;
-	char write_address[PIPENAME_SIZE+5], read_address[PIPENAME_SIZE+5];
+	char write_address[PIPE_PATH_SIZE];
+	char read_address[PIPE_PATH_SIZE] = {'/', 't', 'm', 'p', '/'};
 	connection_t connection;
+
+	pcg32_srandom(time(NULL), (intptr_t)&read);
 
 	printf("Intento conectar\n");
 	conector = pipe_open(address, TRUE);
@@ -48,12 +56,7 @@ connection_t c_connect(char * address, ...) {
 	}
 	printf("Pude conectar\n");
 
-	read_address[0] = '/';
-	read_address[1] = 't';
-	read_address[2] = 'm';
-	read_address[3] = 'p';
-	read_address[4] = '/';
-	randstr(read_address+5, PIPENAME_SIZE);
+	randstr(read_address + PIPE_DIR_SIZE, PIPE_NAME_SIZE);
 	printf("Intento crear el read: %s\n", read_address);
 	read = pipe_make(read_address, FALSE);
 	if(read == NULL) {
@@ -63,9 +66,9 @@ connection_t c_connect(char * address, ...) {
 	}
 	printf("Pude crear el read, lo intento mandar: %s\n", read_address);
 
-	pipe_send(conector, (void *) read_address, PIPENAME_SIZE+5);
+	pipe_send(conector, (void *) read_address, PIPE_PATH_SIZE);
 	printf("Intento recibir el write\n");
-	pipe_receive(read, (void *) write_address, PIPENAME_SIZE+5);
+	pipe_receive(read, (void *) write_address, PIPE_PATH_SIZE);
 	printf("Pude recibir el write, intento abrir: %s\n", write_address);
 
 	write = pipe_open(write_address, TRUE);
@@ -98,11 +101,12 @@ void c_disconnect(connection_t connection) {
 connection_t c_accept(connection_t connection) {
 	network_t * network = (network_t *) connection;
 	pipe_t * read, * write;
-	char write_address[PIPENAME_SIZE+5], read_address[PIPENAME_SIZE+5];
+	char write_address[PIPE_PATH_SIZE];
+	char read_address[PIPE_PATH_SIZE] = {'/', 't', 'm', 'p', '/'};;
 	connection_t nconnection;
 
 	printf("Pido el write\n");
-	pipe_receive(network->read, (void *) write_address, PIPENAME_SIZE+5);
+	pipe_receive(network->read, (void *) write_address, PIPE_PATH_SIZE);
 	printf("Me dio el write: %s\n", write_address);
 
 	printf("Intento abrir el write: %s\n", write_address);
@@ -113,12 +117,7 @@ connection_t c_accept(connection_t connection) {
 	}
 	printf("Pude abrir el write: %s\n", write_address);
 
-	read_address[0] = '/';
-	read_address[1] = 't';
-	read_address[2] = 'm';
-	read_address[3] = 'p';
-	read_address[4] = '/';
-	randstr(read_address+5, PIPENAME_SIZE);
+	randstr(read_address + PIPE_DIR_SIZE, PIPE_NAME_SIZE);
 	printf("Intento crear el read: %s\n", read_address);
 	read = pipe_make(read_address, FALSE);
 	if(read == NULL) {
@@ -128,7 +127,7 @@ connection_t c_accept(connection_t connection) {
 	}
 	printf("Pude crear el read, lo intento mandar: %s\n", read_address);
 
-	pipe_send(write, read_address, PIPENAME_SIZE+5);
+	pipe_send(write, read_address, PIPE_PATH_SIZE);
 	printf("Pude mandar el read: %s\n", read_address);
 
 	printf("Creo la conexion\n");
@@ -169,14 +168,15 @@ static void connection_free(connection_t connection) {
 }
 
 static void randstr(char * s, const int length) {
-	int i;
 	static const char alphanum[] =
 		"0123456789"
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz";
+	static const int alphanum_size = 62;
+	int i;
 
 	for(i = 0; i < length - 1; i++) {
-		s[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+		s[i] = alphanum[pcg32_boundedrand(alphanum_size)];
 	}
 
 	s[length] = 0;

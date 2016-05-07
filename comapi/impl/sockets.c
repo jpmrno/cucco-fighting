@@ -1,4 +1,5 @@
 #include <comapi.h>
+#include <define.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -97,8 +98,10 @@ connection_t c_connect(char * address, ...) {
 void c_disconnect(connection_t connection) {
 	network_t * network = (network_t *) connection;
 
-	close(network->channel);
-	connection_rm(connection);
+	if(network != NULL) {
+		close(network->channel);
+		connection_rm(connection);
+	}
 }
 
 connection_t c_accept(connection_t connection) {

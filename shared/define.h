@@ -1,7 +1,9 @@
 #ifndef _DEFINE_H_
 #define _DEFINE_H_
 
+#ifndef NULL
 #define NULL ((void *) 0)
+#endif
 
 #define TRUE !FALSE
 #define FALSE 0

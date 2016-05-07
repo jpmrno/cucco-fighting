@@ -13,6 +13,7 @@ SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
 SOURCES += $(SRC_IMPL)/$(impl).c
 OBJECTS = $(SOURCES:.c=.o)
 
+SRC_HEADERS += ../$(SHARED_HEADERS)
 HEADERS = $(foreach HEADER,$(SRC_HEADERS),-I $(HEADER))
 
 all: $(TARGET)

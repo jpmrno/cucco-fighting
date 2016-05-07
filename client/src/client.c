@@ -6,7 +6,7 @@
 int main(int argc, char const * argv[]) {
 	connection_t connection;
 
-	connection = c_connect("127.0.0.1", 8080);
+	connection = c_connect("/tmp/server");
 	if(connection == NULL) {
 		printf("Error en la conexion!\n");
 	}

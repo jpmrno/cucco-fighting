@@ -14,13 +14,13 @@ static volatile int running = TRUE;
 int main(int argc, char const * argv[]) {
 	int connection_numer = 0;
 	connection_t connection_accepted;
-	connection_t connection = c_mkserver("127.0.0.1", 8080);
+	connection_t connection = c_mkserver("/tmp/server");
 	if(connection == NULL) {
 		printf("Error en la conexion!\n");
 		return 1;
 	}
 
-	while(running) {  // main accept() loop
+	while(running) {
 		connection_accepted = c_accept(connection);
 		if(connection_accepted == NULL) {
 			printf("Error en la nueva conexion!\n");
@@ -30,7 +30,7 @@ int main(int argc, char const * argv[]) {
 		connection_numer++;
 
 		if(!fork()) { // Child process
-			c_disconnect(connection);
+			//c_disconnect(connection);
 
 			handle(connection_accepted);
 

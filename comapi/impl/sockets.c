@@ -20,6 +20,7 @@ static connection_t connection_new(char * address, int sockfd, int port_n);
 static void connection_rm(connection_t connection);
 
 connection_t c_mkserver(char * address, ...) { // TODO: No necesita el address?
+	connection_t nconnection;
 	struct sockaddr_in socket_a;
 	int sockfd, port_n;
 	va_list args;
@@ -48,10 +49,16 @@ connection_t c_mkserver(char * address, ...) { // TODO: No necesita el address?
 		return NULL;
 	}
 
-	return connection_new(address, sockfd, port_n);
+	nconnection = connection_new(address, sockfd, port_n);
+	if(nconnection == NULL) {
+		close(sockfd);
+	}
+
+	return nconnection;
 }
 
 connection_t c_connect(char * address, ...) {
+	connection_t nconnection;
 	struct sockaddr_in socket_a;
 	int sockfd, port_n;
 	va_list args;
@@ -79,7 +86,12 @@ connection_t c_connect(char * address, ...) {
 		return NULL;
 	}
 
-	return connection_new(address, sockfd, port_n);
+	nconnection = connection_new(address, sockfd, port_n);
+	if(nconnection == NULL) {
+		close(sockfd);
+	}
+
+	return nconnection;
 }
 
 void c_disconnect(connection_t connection) {
@@ -91,6 +103,7 @@ void c_disconnect(connection_t connection) {
 
 connection_t c_accept(connection_t connection) {
 	network_t * network = (network_t *) connection;
+	connection_t nconnection;
 	struct sockaddr_in socket_a;
 	socklen_t socket_a_len;
 	int sockfd;
@@ -102,7 +115,12 @@ connection_t c_accept(connection_t connection) {
 		return NULL;
 	}
 
-	return connection_new(network->address, sockfd, network->port);
+	nconnection = connection_new(network->address, sockfd, network->port);
+	if(nconnection == NULL) {
+		close(sockfd);
+	}
+
+	return nconnection;
 }
 
 // int send(connection_t connection, data_t data) {
@@ -120,17 +138,16 @@ static connection_t connection_new(char * address, int sockfd, int port_n) {
 
 	network = malloc(sizeof(network_t));
 	if(network == NULL) {
-		close(sockfd);
 		return NULL;
 	}
 
 	network->address = malloc(sizeof(char) * strlen(address));
 	if(network->address == NULL) {
-		close(sockfd);
 		free(network);
 		return NULL;
 	}
 	strcpy(network->address, address);
+
 	network->port = port_n;
 	network->channel = sockfd;
 
@@ -139,6 +156,7 @@ static connection_t connection_new(char * address, int sockfd, int port_n) {
 
 static void connection_rm(connection_t connection) {
 	network_t * network = (network_t *) connection;
+
 	free(network->address);
 	free(network);
 }

@@ -32,8 +32,8 @@ int main(int argc, char const * argv[]) {
 
 	connection = server_connect(config_file);
 	if(connection == NULL) {
-		printf("Error en la conexion!\n");
-		return 1;
+		fprintf(stderr, "No se pudo conectar al servidor.\n");
+		exit(EXIT_FAILURE);
 	}
 
 	signal(SIGINT, handle_int);

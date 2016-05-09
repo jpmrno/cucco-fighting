@@ -19,7 +19,7 @@ help:
 
 all: clean build
 
-build: libs server client
+build: libs server client database
 
 libs:
 	$(MAKE) -C $@ all
@@ -32,9 +32,13 @@ client: libs
 	$(call check_defined, impl)
 	$(MAKE) -C $@ all impl=$(impl)
 
+database:
+	$(MAKE) -C $@ all
+
 clean:
 	$(MAKE) -C libs clean
 	$(MAKE) -C server clean
 	$(MAKE) -C client clean
+	$(MAKE) -C database clean
 
-.PHONY: help all build libs server client clean
+.PHONY: help all build libs server client database clean

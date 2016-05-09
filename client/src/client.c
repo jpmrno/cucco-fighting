@@ -4,11 +4,15 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 
+static void handle_int(int sign);
+
+static connection_t connection = NULL;
+
 int main(int argc, char const * argv[]) {
-	connection_t connection;
 	const char * config_file;
 
 	switch(argc) {
@@ -32,6 +36,8 @@ int main(int argc, char const * argv[]) {
 		return 1;
 	}
 
+	signal(SIGINT, handle_int);
+
 	char * string = malloc(sizeof(char) * 10);
 	if(string == NULL) {
 		return 1;
@@ -43,4 +49,10 @@ int main(int argc, char const * argv[]) {
 	server_disconnect(connection);
 
 	return 0;
+}
+
+static void handle_int(int sign) {
+	if(sign == SIGINT) {
+		server_disconnect(connection);
+	}
 }

@@ -4,15 +4,19 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h> // TODO: Remove
+#include <signal.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 
-int handle(connection_t connection);
+static int handle(connection_t connection);
+static void handle_int(int sign);
+
+static connection_t connection = NULL;
 
 int main(int argc, char const * argv[]) {
-	connection_t connection, connection_accepted;
-	int connection_numer = 0, ret;
 	const char * config_file;
+	int connection_numer = 0;
 
 	switch(argc) {
 		case 1: {
@@ -32,25 +36,37 @@ int main(int argc, char const * argv[]) {
 	connection = server_open(config_file);
 	if(connection == NULL) {
 		printf("Error en la conexion!\n");
-		return 1;
+		exit(EXIT_FAILURE);
 	}
 
+	signal(SIGINT, handle_int);
+	signal(SIGCHLD, handle_int);
+
 	while(TRUE) {
+		connection_t connection_accepted;
+		int ret, pid;
+
 		connection_accepted = server_accept(connection);
 		if(connection_accepted == NULL) {
 			printf("Error en la nueva conexion!\n");
-			return 1;
+			exit(EXIT_FAILURE);
 		}
 
 		connection_numer++;
 
-		if(!fork()) { // Child process
+		pid = fork();
+		if(pid == -1) {
+			printf("Error en el fork!\n");
+			exit(EXIT_FAILURE);
+		}
+
+		if(!pid) { // Child process
 			server_ajar(connection);
 
 			ret = handle(connection_accepted);
 
 			server_close(connection_accepted);
-			exit(ret); // TODO: Porq no return ret;?
+			exit(ret);
 		}
 
 		printf("(%d) Desconectando nueva conexion...\n", connection_numer);
@@ -63,10 +79,13 @@ int main(int argc, char const * argv[]) {
 	return 0;
 }
 
-int handle(connection_t connection) {
-	printf("Me pude conectar!\n");
+static int handle(connection_t connection) {
+	int random;
 
-	sleep(10);
+	srand(time(NULL)+(time_t)&random);
+	random = rand()%10;
+	printf("(%d) Me pude conectar!\n", random);
+	sleep(random);
 
 	static char * string = "HOLA!";
 	server_send(connection, string, (size_t) 6);
@@ -74,3 +93,12 @@ int handle(connection_t connection) {
 	return 0;
 }
 
+static void handle_int(int sign) {
+	if(sign == SIGINT) {
+		server_close(connection);
+	} else if(sign == SIGCHLD) {
+		int status;
+
+		waitpid(-1, &status, 0);
+	}
+}

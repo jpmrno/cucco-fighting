@@ -8,7 +8,7 @@ ifeq ($(shell uname), Darwin)
 else
 	GCC = gcc
 	GCC_FLAGS += -D_BSD_SOURCE
-	
+
 	AR = ar
 	AR_FLAGS = -rvs
 endif

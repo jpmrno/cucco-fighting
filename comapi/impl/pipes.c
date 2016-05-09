@@ -6,7 +6,10 @@
 #include <sys/file.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
+
+// TODO: Remove printfs!
 
 #define PIPE_PATH_DEFAULT "/tmp/server"
 #define PIPE_NAME_SIZE 11
@@ -71,12 +74,15 @@ void server_ajar(connection_t connection) {
 
 connection_t server_accept(connection_t connection) {
 	network_t * nnetwork, * network = (network_t *) connection;
+	char write_address[PIPE_PATH_SIZE], read_address[PIPE_PATH_SIZE];
 	pipe_t read, write;
-	char write_address[PIPE_PATH_SIZE];
-	char read_address[PIPE_PATH_SIZE] = {'/', 't', 'm', 'p', '/'};;
+
+	strcpy(read_address, "/tmp/");
 
 	printf("Pido el write\n");
-	pipe_receive(network->read, (void *) write_address, PIPE_PATH_SIZE);
+	if(pipe_receive(network->read, (void *) write_address, PIPE_PATH_SIZE) == -1) {
+		return NULL;
+	}
 	printf("Tengo el write: %s\n", write_address);
 
 	write = pipe_open(write_address, TRUE);
@@ -90,7 +96,12 @@ connection_t server_accept(connection_t connection) {
 		pipe_close(write);
 		return NULL;
 	}
-	pipe_send(write, read_address, PIPE_PATH_SIZE);
+
+	if(pipe_send(write, read_address, PIPE_PATH_SIZE) == -1) {
+		pipe_close(write);
+		pipe_remove(read);
+		return NULL;
+	}
 	printf("Cree el read: %s\n", read_address);
 
 	nnetwork = network_new(read, write);
@@ -162,10 +173,11 @@ static connection_t mkserver(char * address, ...) {
 }
 
 static connection_t cserver(char * address, ...) {
-	pipe_t read, write, conector;
-	char write_address[PIPE_PATH_SIZE];
-	char read_address[PIPE_PATH_SIZE] = {'/', 't', 'm', 'p', '/'};
 	network_t * network;
+	char write_address[PIPE_PATH_SIZE], read_address[PIPE_PATH_SIZE];
+	pipe_t read, write, conector;
+
+	strcpy(read_address, "/tmp/");
 
 	pcg32_srandom(time(NULL), (intptr_t)&read);
 
@@ -183,8 +195,17 @@ static connection_t cserver(char * address, ...) {
 	}
 	printf("Cree el read: %s\n", read_address);
 
-	pipe_send(conector, (void *) read_address, PIPE_PATH_SIZE);
-	pipe_receive(read, (void *) write_address, PIPE_PATH_SIZE);
+	if(pipe_send(conector, (void *) read_address, PIPE_PATH_SIZE) == -1) {
+		pipe_close(conector);
+		pipe_remove(read);
+		return NULL;
+	}
+
+	if(pipe_receive(read, (void *) write_address, PIPE_PATH_SIZE) == -1) {
+		pipe_close(conector);
+		pipe_remove(read);
+		return NULL;
+	}
 
 	write = pipe_open(write_address, TRUE);
 	if(write == NULL) {

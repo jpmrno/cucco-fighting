@@ -38,7 +38,7 @@ static void config_free(config_t * config);
 static network_t * network_new(char * address, int sockfd, int port_n);
 static void network_free(network_t * connection);
 
-connection_t server_open(char * config_file) {
+connection_t server_open(const char * config_file) {
 	connection_t connection;
 	config_t * config;
 
@@ -56,13 +56,12 @@ connection_t server_open(char * config_file) {
 	return connection;
 }
 
-void server_disconnect(connection_t connection) {
-	network_t * network = (network_t *) connection;
+void server_close(connection_t connection) {
+	server_disconnect(connection);
+}
 
-	if(network != NULL) {
-		close(network->channel);
-		network_free(network);
-	}
+void server_ajar(connection_t connection) {
+	server_disconnect(connection);
 }
 
 connection_t server_accept(connection_t connection) {
@@ -85,7 +84,7 @@ connection_t server_accept(connection_t connection) {
 	return (connection_t) nnetwork;
 }
 
-connection_t server_connect(char * config_file) {
+connection_t server_connect(const char * config_file) {
 	connection_t connection;
 	config_t * config;
 
@@ -99,6 +98,15 @@ connection_t server_connect(char * config_file) {
 	config_free(config);
 
 	return connection;
+}
+
+void server_disconnect(connection_t connection) {
+	network_t * network = (network_t *) connection;
+
+	if(network != NULL) {
+		close(network->channel);
+		network_free(network);
+	}
 }
 
 static connection_t mkserver(char * address, ...) {

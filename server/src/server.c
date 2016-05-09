@@ -24,7 +24,7 @@ int main(int argc, char const * argv[]) {
 	}
 
 	while(TRUE) {
-		connection_accepted = server_acept(connection);
+		connection_accepted = server_accept(connection);
 		if(connection_accepted == NULL) {
 			printf("Error en la nueva conexion!\n");
 			return 1;
@@ -33,7 +33,7 @@ int main(int argc, char const * argv[]) {
 		connection_numer++;
 
 		if(!fork()) { // Child process
-			server_disconnect(connection);
+			server_ajar(connection);
 
 			ret = handle(connection_accepted);
 
@@ -42,7 +42,7 @@ int main(int argc, char const * argv[]) {
 		}
 
 		printf("(%d) Desconectando nueva conexion...\n", connection_numer);
-		server_disconnect(connection_accepted);
+		server_ajar(connection_accepted);
 	}
 
 	printf("Desconectando principal conexion...\n");

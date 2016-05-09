@@ -14,8 +14,8 @@
 #define PIPE_PATH_SIZE (PIPE_DIR_SIZE + PIPE_NAME_SIZE)
 
 typedef struct {
-	pipe_t * read;
-	pipe_t * write;
+	pipe_t read;
+	pipe_t write;
 } __attribute__((packed)) network_t;
 
 typedef struct {
@@ -28,10 +28,10 @@ static connection_t cserver(char * address, ...);
 static config_t * config_new();
 static void config_free(config_t * config);
 
-static network_t * network_new(pipe_t * read, pipe_t * write);
+static network_t * network_new(pipe_t read, pipe_t write);
 static void network_free(network_t * network);
 
-connection_t server_open(char * config_file) {
+connection_t server_open(const char * config_file) {
 	connection_t connection;
 	config_t * config;
 
@@ -59,7 +59,7 @@ void server_close(connection_t connection) {
 	}
 }
 
-void server_disconnect(connection_t connection) {
+void server_ajar(connection_t connection) {
 	network_t * network = (network_t *) connection;
 
 	if(network != NULL) {
@@ -71,7 +71,7 @@ void server_disconnect(connection_t connection) {
 
 connection_t server_accept(connection_t connection) {
 	network_t * nnetwork, * network = (network_t *) connection;
-	pipe_t * read, * write;
+	pipe_t read, write;
 	char write_address[PIPE_PATH_SIZE];
 	char read_address[PIPE_PATH_SIZE] = {'/', 't', 'm', 'p', '/'};;
 
@@ -104,7 +104,7 @@ connection_t server_accept(connection_t connection) {
 	return (connection_t) nnetwork;
 }
 
-connection_t server_connect(char * config_file) {
+connection_t server_connect(const char * config_file) {
 	connection_t connection;
 	config_t * config;
 
@@ -132,7 +132,7 @@ void server_disconnect(connection_t connection) {
 
 static connection_t mkserver(char * address, ...) {
 	network_t * network;
-	pipe_t * read;
+	pipe_t read;
 
 	pcg32_srandom(time(NULL), (intptr_t)&read);
 
@@ -150,7 +150,7 @@ static connection_t mkserver(char * address, ...) {
 }
 
 static connection_t cserver(char * address, ...) {
-	pipe_t * read, * write, * conector;
+	pipe_t read, write, conector;
 	char write_address[PIPE_PATH_SIZE];
 	char read_address[PIPE_PATH_SIZE] = {'/', 't', 'm', 'p', '/'};
 	network_t * network;
@@ -228,7 +228,7 @@ static void config_free(config_t * config) {
 	free(config);
 }
 
-static network_t * network_new(pipe_t * read, pipe_t * write) {
+static network_t * network_new(pipe_t read, pipe_t write) {
 	network_t * network;
 
 	network = malloc(sizeof(network_t));

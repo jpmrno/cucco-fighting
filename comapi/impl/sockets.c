@@ -32,12 +32,19 @@ typedef struct {
 
 static connection_t mkserver(char * address, ...);
 static connection_t cserver(char * address, ...);
+static void dserver(network_t * network);
 
 static config_t * config_new();
 static void config_free(config_t * config);
 
 static network_t * network_new(char * address, int sockfd, int port_n);
 static void network_free(network_t * connection);
+
+// ---[ Server ]---------------------------------------
+#ifdef SERVER
+#ifndef CLIENT
+
+#define OK_DEFINED
 
 connection_t server_open(const char * config_file) {
 	connection_t connection;
@@ -58,11 +65,11 @@ connection_t server_open(const char * config_file) {
 }
 
 void server_close(connection_t connection) {
-	server_disconnect(connection);
+	dserver((network_t *) connection);
 }
 
 void server_ajar(connection_t connection) {
-	server_disconnect(connection);
+	dserver((network_t *) connection);
 }
 
 connection_t server_accept(connection_t connection) {
@@ -85,6 +92,16 @@ connection_t server_accept(connection_t connection) {
 	return (connection_t) nnetwork;
 }
 
+#endif
+#endif
+// ----------------------------------------------------
+
+// ---[ Client ]---------------------------------------
+#ifdef CLIENT
+#ifndef SERVER
+
+#define OK_DEFINED
+
 connection_t server_connect(const char * config_file) {
 	connection_t connection;
 	config_t * config;
@@ -102,13 +119,15 @@ connection_t server_connect(const char * config_file) {
 }
 
 void server_disconnect(connection_t connection) {
-	network_t * network = (network_t *) connection;
-
-	if(network != NULL) {
-		close(network->channel);
-		network_free(network);
-	}
+	dserver((network_t *) connection);
 }
+
+#endif
+#endif
+// ----------------------------------------------------
+
+// ---[ Common ]---------------------------------------
+#ifdef OK_DEFINED
 
 int server_send(connection_t connection, const void * data, size_t size) {
 	network_t * network = (network_t *) connection;
@@ -121,6 +140,9 @@ int server_receive(connection_t connection, void * data, size_t size) {
 
 	return read(network->channel, data, size);
 }
+
+#endif
+// ----------------------------------------------------
 
 static connection_t mkserver(char * address, ...) {
 	network_t * network;
@@ -197,6 +219,13 @@ static connection_t cserver(char * address, ...) {
 	}
 
 	return (connection_t) network;
+}
+
+static void dserver(network_t * network) {
+	if(network != NULL) {
+		close(network->channel);
+		network_free(network);
+	}
 }
 
 static config_t * config_new(const char * file) {

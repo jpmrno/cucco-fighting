@@ -6,32 +6,35 @@ __check_defined = $(if $(value $1),, \
 
 help:
 	@echo "Cucco Fighting!'s makefile"
-	@echo "Clean & Build: 'make all impl=<sockets/pipes>'"
-	@echo "Build: 'make <option> impl=<sockets/pipes>'"
-	@echo "  - Options: 'server', 'client', 'database', 'logger', 'comapi', 'shared'"
-	@echo "Clean: 'make clean'"
+	@echo "All:"
+	@echo "  'make all impl=<sockets/pipes>'"
+	@echo "Server/Client:"
+	@echo "  'make <option> impl=<sockets/pipes>'"
+	@echo "  - Options: 'server', 'client'"
+	@echo "Others:"
+	@echo "  make <option>'"
+	@echo "  - Options: 'database', 'logger', 'libs'"
+	@echo "Clean:"
+	@echo "  'make clean'"
 
 all: clean build
 
-build: shared comapi server client
+build: libs server client
 
-shared:
+libs:
 	$(MAKE) -C $@ all
 
-comapi:
+server: libs
 	$(call check_defined, impl)
 	$(MAKE) -C $@ all impl=$(impl)
 
-server: shared comapi
-	$(MAKE) -C $@ all
-
-client: shared comapi
-	$(MAKE) -C $@ all
+client: libs
+	$(call check_defined, impl)
+	$(MAKE) -C $@ all impl=$(impl)
 
 clean:
-	$(MAKE) -C shared clean
-	$(MAKE) -C comapi clean
+	$(MAKE) -C libs clean
 	$(MAKE) -C server clean
 	$(MAKE) -C client clean
 
-.PHONY: help all build shared server client comapi clean
+.PHONY: help all build libs server client clean

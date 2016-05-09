@@ -34,6 +34,12 @@ static void config_free(config_t * config);
 static network_t * network_new(pipe_t read, pipe_t write);
 static void network_free(network_t * network);
 
+// ---[ Server ]---------------------------------------
+#ifdef SERVER
+#ifndef CLIENT
+
+#define OK_DEFINED
+
 connection_t server_open(const char * config_file) {
 	connection_t connection;
 	config_t * config;
@@ -115,6 +121,16 @@ connection_t server_accept(connection_t connection) {
 	return (connection_t) nnetwork;
 }
 
+#endif
+#endif
+// ----------------------------------------------------
+
+// ---[ Client ]---------------------------------------
+#ifdef CLIENT
+#ifndef SERVER
+
+#define OK_DEFINED
+
 connection_t server_connect(const char * config_file) {
 	connection_t connection;
 	config_t * config;
@@ -141,6 +157,13 @@ void server_disconnect(connection_t connection) {
 	}
 }
 
+#endif
+#endif
+// ----------------------------------------------------
+
+// ---[ Common ]---------------------------------------
+#ifdef OK_DEFINED
+
 int server_send(connection_t connection, const void * data, size_t size) {
 	network_t * network = (network_t *) connection;
 
@@ -152,6 +175,9 @@ int server_receive(connection_t connection, void * data, size_t size) {
 
 	return pipe_receive(network->read, data, size);
 }
+
+#endif
+// ----------------------------------------------------
 
 static connection_t mkserver(char * address, ...) {
 	network_t * network;

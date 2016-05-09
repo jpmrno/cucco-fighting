@@ -1,28 +1,27 @@
-include ../makevars
+include ../../makevars
 
 # --[ Vars ]------------------ #
-NAME = shared
+NAME = pipes
 SRC_C = .
-SRC_HEADERS = .
+SRC_HEADERS = ../include
 # ---------------------------- #
 
-TARGET = lib$(NAME).a
+LIB = ../lib$(NAME).a
 
-SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
-OBJECTS = $(SOURCES:.c=.o)
+SOURCES_C = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
+OBJECTS_C = $(SOURCES_C:.c=.o)
 
 HEADERS = $(foreach HEADER,$(SRC_HEADERS),-I $(HEADER))
 
-# TODO:
-all:
+all: $(LIB)
 
-$(TARGET): $(OBJECTS)
+$(LIB): $(OBJECTS_C)
 	$(AR) $(AR_FLAGS) $@ $^
 
 %.o: %.c
 	$(GCC) $(GCC_FLAGS) $(HEADERS) -c $< -o $@
 
 clean:
-	rm -f $(TARGET) $(OBJECTS)
+	rm -f $(LIB) $(OBJECTS_C)
 
 .PHONY: all clean

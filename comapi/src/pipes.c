@@ -9,14 +9,30 @@
 
 #define FIFO_MODE 0777
 
-pipe_t * pipe_make(char * address, int write) {
-	pipe_t * pipe;
+// typedef enum {
+// 	FILE = 0,
+// 	FILE_DESCRIPTOR
+// } type_t;
+
+// typedef union {
+// 	FILE * file;
+// 	int fd;
+// } channel_t;
+
+typedef struct {
+	int owner;
+	char * address;
+	int channel;
+} __attribute__((packed)) npipe_t;
+
+pipe_t pipe_make(char * address, int write) {
+	npipe_t * pipe;
 
 	if(mkfifo(address, FIFO_MODE) == -1) {
 		return NULL;
 	}
 
-	pipe = pipe_open(address, write);
+	pipe = (npipe_t *) pipe_open(address, write);
 	if(pipe == NULL) {
 		unlink(address);
 		return NULL;
@@ -24,19 +40,30 @@ pipe_t * pipe_make(char * address, int write) {
 
 	pipe->owner = TRUE;
 
-	return pipe;
+	return (pipe_t) pipe;
 }
 
-pipe_t * pipe_open(char * address, int write) {
-	int file;
-	pipe_t * pipe;
+void pipe_remove(pipe_t pipe) {
+	npipe_t * npipe = (npipe_t *) pipe;
 
-	file = open(address, O_RDWR); // TODO: puse O_RDWR como salvedad
+	if(pipe != NULL) {
+		if(npipe->owner) {
+			unlink(npipe->address);
+		}
+		pipe_close(pipe);
+	}
+}
+
+pipe_t pipe_open(char * address, int write) {
+	int file;
+	npipe_t * pipe;
+
+	file = open(address, O_RDWR); // TODO: puse O_RDWR como salvedad...
 	if(file == -1) {
 		return NULL;
 	}
 
-	pipe = malloc(sizeof(pipe_t));
+	pipe = malloc(sizeof(npipe_t));
 	if(pipe == NULL) {
 		close(file);
 		return NULL;
@@ -53,30 +80,27 @@ pipe_t * pipe_open(char * address, int write) {
 	strcpy(pipe->address, address);
 	pipe->channel = file;
 
-	return pipe;
+	return (pipe_t) pipe;
 }
 
-void pipe_remove(pipe_t * pipe) {
-	if(pipe != NULL) {
-		if(pipe->owner) {
-			unlink(pipe->address);
-		}
-		pipe_close(pipe);
+void pipe_close(pipe_t pipe) {
+	npipe_t * npipe = (npipe_t *) pipe;
+
+	if(npipe != NULL) {
+		close(npipe->channel);
+		free(npipe->address);
+		free(npipe);
 	}
 }
 
-void pipe_close(pipe_t * pipe) {
-	if(pipe != NULL) {
-		close(pipe->channel);
-		free(pipe->address);
-		free(pipe);
-	}
+int pipe_send(pipe_t pipe, void * data, const int size) {
+	npipe_t * npipe = (npipe_t *) pipe;
+
+	return write(npipe->channel, data, size);
 }
 
-int pipe_send(pipe_t * pipe, void * data, const int size) {
-	return write(pipe->channel, data, size);
-}
+int pipe_receive(pipe_t pipe, void * data, const int size) {
+	npipe_t * npipe = (npipe_t *) pipe;
 
-int pipe_receive(pipe_t * pipe, void * data, const int size) {
-	return read(pipe->channel, data, size);
+	return read(npipe->channel, data, size);
 }

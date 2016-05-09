@@ -12,17 +12,95 @@
 
 // http://www.beej.us/guide/bgnet/output/html/singlepage/bgnet.html
 
+#define IP_SIZE_MAX 13
+#define IP_DEFAULT "127.0.0.1"
+#define PORT_DEFAULT 8080
+
 typedef struct {
 	char * address;
 	int port;
 	int channel;
 } __attribute__((packed)) network_t;
 
-static connection_t connection_new(char * address, int sockfd, int port_n);
-static void connection_rm(connection_t connection);
+typedef struct {
+	char * ip;
+	int port;
+} __attribute__((packed)) config_t;
 
-connection_t c_mkserver(char * address, ...) { // TODO: No necesita el address?
-	connection_t nconnection;
+static connection_t mkserver(char * address, ...);
+static connection_t cserver(char * address, ...);
+
+static config_t * config_new();
+static void config_free(config_t * config);
+
+static network_t * network_new(char * address, int sockfd, int port_n);
+static void network_rm(network_t * connection);
+
+connection_t server_open(char * config_file) {
+	connection_t connection;
+	config_t * config;
+
+	config = config_new(config_file);
+	if(config == NULL) {
+		return NULL;
+	}
+
+	printf("Tengo: %s:%d\n", config->ip, config->port);
+
+	connection = mkserver(config->ip);
+
+	config_free(config);
+
+	return connection;
+}
+
+void server_disconnect(connection_t connection) {
+	network_t * network = (network_t *) connection;
+
+	if(network != NULL) {
+		close(network->channel);
+		network_free(network);
+	}
+}
+
+connection_t server_accept(connection_t connection) {
+	network_t * nnetwork, * network = (network_t *) connection;
+	struct sockaddr_in socket_a;
+	socklen_t socket_a_len = sizeof(socket_a);
+	int sockfd;
+
+	sockfd = accept(network->channel, (struct sockaddr *) &socket_a, &socket_a_len);
+	if(sockfd == -1) {
+		return NULL;
+	}
+
+	nnetwork = network_new(network->address, sockfd, network->port);
+	if(nnetwork == NULL) {
+		close(sockfd);
+		return NULL;
+	}
+
+	return (connection_t) nnetwork;
+}
+
+connection_t server_connect(char * config_file) {
+	connection_t connection;
+	config_t * config;
+
+	config = config_new(config_file);
+	if(config == NULL) {
+		return NULL;
+	}
+
+	connection = cserver(config->ip);
+
+	config_free(config);
+
+	return connection;
+}
+
+static connection_t c_mkserver(char * address, ...) {
+	network_t * network;
 	struct sockaddr_in socket_a;
 	int sockfd, port_n;
 	va_list args;
@@ -51,16 +129,17 @@ connection_t c_mkserver(char * address, ...) { // TODO: No necesita el address?
 		return NULL;
 	}
 
-	nconnection = connection_new(address, sockfd, port_n);
-	if(nconnection == NULL) {
+	network = network_new(address, sockfd, port_n);
+	if(network == NULL) {
 		close(sockfd);
+		return NULL;
 	}
 
-	return nconnection;
+	return (connection_t) network;
 }
 
-connection_t c_connect(char * address, ...) {
-	connection_t nconnection;
+static connection_t cserver(char * address, ...) {
+	network_t * network;
 	struct sockaddr_in socket_a;
 	int sockfd, port_n;
 	va_list args;
@@ -88,56 +167,57 @@ connection_t c_connect(char * address, ...) {
 		return NULL;
 	}
 
-	nconnection = connection_new(address, sockfd, port_n);
-	if(nconnection == NULL) {
+	network = network_new(address, sockfd, port_n);
+	if(network == NULL) {
 		close(sockfd);
-	}
-
-	return nconnection;
-}
-
-void c_disconnect(connection_t connection) {
-	network_t * network = (network_t *) connection;
-
-	if(network != NULL) {
-		close(network->channel);
-		connection_rm(connection);
-	}
-}
-
-connection_t c_accept(connection_t connection) {
-	network_t * network = (network_t *) connection;
-	connection_t nconnection;
-	struct sockaddr_in socket_a;
-	socklen_t socket_a_len;
-	int sockfd;
-
-	socket_a_len = sizeof(socket_a);
-
-	sockfd = accept(network->channel, (struct sockaddr *) &socket_a, &socket_a_len);
-	if(sockfd == -1) {
 		return NULL;
 	}
 
-	nconnection = connection_new(network->address, sockfd, network->port);
-	if(nconnection == NULL) {
-		close(sockfd);
-	}
-
-	return nconnection;
+	return (connection_t) network;
 }
 
-// int send(connection_t connection, data_t data) {
+static config_t * config_new(const char * file) {
+	config_t * config;
+	char * ip;
+	int port, ret;
 
+	ip = malloc(sizeof(char) * IP_SIZE_MAX);
+	if(ip == NULL) {
+		return NULL;
+	}
 
-// 	return TRUE;
-// }
+	ret = ini_gets("network", "ip", IP_DEFAULT, ip, IP_SIZE_MAX, file);
+	if(ret <= 0) {
+		free(ip);
+		return NULL;
+	}
 
-// data_t receive(connection_t connection) {
+	port = ini_geti("network", "port", PORT_DEFAULT, file);
+	if(ret <= 0) { // TODO: Validar nuero de puerto?
+		free(ip);
+		return NULL;
+	}
 
-// }
+	printf("Configured address: %s:%d\n", ip, port);
 
-static connection_t connection_new(char * address, int sockfd, int port_n) {
+	config = malloc(sizeof(config_t));
+	if(config == NULL) {
+		free(ip);
+		return NULL;
+	}
+
+	config->ip = ip;
+	config->port = port;
+
+	return config;
+}
+
+static void config_free(config_t * config) {
+	free(config->address);
+	free(config);
+}
+
+static network_t * network_new(char * address, int sockfd, int port_n) {
 	network_t * network;
 
 	network = malloc(sizeof(network_t));
@@ -150,17 +230,17 @@ static connection_t connection_new(char * address, int sockfd, int port_n) {
 		free(network);
 		return NULL;
 	}
-	strcpy(network->address, address);
 
+	strcpy(network->address, address);
 	network->port = port_n;
 	network->channel = sockfd;
 
-	return (connection_t) network;
+	return network;
 }
 
-static void connection_rm(connection_t connection) {
-	network_t * network = (network_t *) connection;
-
-	free(network->address);
-	free(network);
+static void network_free(network_t * network) {
+	if(network != NULL) {
+		free(network->address);
+		free(network);
+	}
 }

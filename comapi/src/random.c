@@ -113,3 +113,18 @@ uint32_t pcg32_boundedrand(uint32_t bound)
 {
     return pcg32_boundedrand_r(&pcg32_global, bound);
 }
+
+void randstr(char * s, const int length) {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    static const int alphanum_size = 62;
+    int i;
+
+    for(i = 0; i < length - 1; i++) {
+        s[i] = alphanum[pcg32_boundedrand(alphanum_size)];
+    }
+
+    s[length] = 0;
+}

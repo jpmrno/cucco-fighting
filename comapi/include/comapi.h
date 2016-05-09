@@ -1,47 +1,43 @@
 #ifndef _COMAPI_H_
 #define _COMAPI_H_
 
-//
-// Connection
-//
-
+// ---[ Connection ]-----------------------------------
 struct network_t;
 typedef struct network_t * connection_t;
+// ----------------------------------------------------
 
-// //
-// // General
-// //
+// ---[ Server ]---------------------------------------
+#ifdef SERVER
+#define OK_DEFINED
+#ifdef CLIENT
+// TODO: Error de compilacion?
+#endif
 
-// typedef enum {
-// 	VALUE_BOOLEAN = 0,
-// 	VALUE_INTEGER,
-// 	VALUE_STRING
-// } type_t;
-
-// typedef union {
-// 	int boolean;
-// 	int integer;
-// 	char * string;
-// } value_t;
-
-// typedef struct {
-// 	type_t type;
-// 	value_t value;
-// } __attribute__((packed)) arg_t;
-
-// typedef struct {
-// 	int size;
-// 	arg_t * vars;
-// } __attribute__((packed)) args_t;
-
-connection_t server_start();
-void server_stop(connection_t connection);
-connection_t server_incoming(connection_t connection);
-
-connection_t server_connect();
+connection_t server_open(char * config_file);
+void server_close(connection_t connection);
 void server_disconnect(connection_t connection);
 
+connection_t server_accept(connection_t connection);
+#endif
+// ----------------------------------------------------
+
+// ---[ Client ]---------------------------------------
+#ifdef CLIENT
+#define OK_DEFINED
+#ifdef SERVER
+// TODO: Error de compilacion?
+#endif
+
+connection_t server_connect(char * config_file);
+void server_disconnect(connection_t connection);
+#endif
+// ----------------------------------------------------
+
+// ---[ Common ]---------------------------------------
+#ifdef OK_DEFINED
 // int send(connection_t connection, data_t * data);
 // int receive(connection_t connection, data_t * data);
+#endif
+// ----------------------------------------------------
 
 #endif

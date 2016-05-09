@@ -5,7 +5,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdarg.h>
 #include <string.h>
 #include <strings.h>
@@ -13,6 +12,8 @@
 #include <minIni.h>
 
 // http://www.beej.us/guide/bgnet/output/html/singlepage/bgnet.html
+
+// TODO: Remove printfs!
 
 #define IP_SIZE_MAX 13
 #define IP_DEFAULT "127.0.0.1"
@@ -107,6 +108,18 @@ void server_disconnect(connection_t connection) {
 		close(network->channel);
 		network_free(network);
 	}
+}
+
+int server_send(connection_t connection, const void * data, size_t size) {
+	network_t * network = (network_t *) connection;
+
+	return write(network->channel, data, size);
+}
+
+int server_receive(connection_t connection, void * data, size_t size) {
+	network_t * network = (network_t *) connection;
+
+	return read(network->channel, data, size);
 }
 
 static connection_t mkserver(char * address, ...) {

@@ -1,6 +1,8 @@
 #ifndef _COMAPI_H_
 #define _COMAPI_H_
 
+#include <unistd.h>
+
 // ---[ Connection ]-----------------------------------
 struct network_t;
 typedef struct network_t * connection_t;
@@ -39,8 +41,8 @@ void server_disconnect(connection_t connection);
 
 // ---[ Common ]---------------------------------------
 #ifdef OK_DEFINED
-// int send(connection_t connection, data_t * data);
-// int receive(connection_t connection, data_t * data);
+int server_send(connection_t connection, const void * data, size_t size);
+int server_receive(connection_t connection, void * data, size_t size);
 #endif
 // ----------------------------------------------------
 

@@ -24,8 +24,8 @@ int main(int argc, char const * argv[]) {
 		} break;
 
 		default: {
-			printf("Usage: 'server.app [config_file]'.\n"); // TODO: perror()
-			return 1;
+			fprintf(stderr, "Usage: 'server.app [config_file]'.\n");
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -65,6 +65,11 @@ int main(int argc, char const * argv[]) {
 
 int handle(connection_t connection) {
 	printf("Me pude conectar!\n");
+
+	sleep(10);
+
+	static char * string = "HOLA!";
+	server_send(connection, string, (size_t) 6);
 
 	return 0;
 }

@@ -3,6 +3,7 @@
 #include <comapi.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 
@@ -20,8 +21,8 @@ int main(int argc, char const * argv[]) {
 		} break;
 
 		default: {
-			printf("Usage: 'server.app [config_file]'.\n"); // TODO: perror()
-			return 1;
+			fprintf(stderr, "Usage: 'server.app [config_file]'.\n");
+			exit(EXIT_FAILURE);
 		}
 	}
 
@@ -30,6 +31,14 @@ int main(int argc, char const * argv[]) {
 		printf("Error en la conexion!\n");
 		return 1;
 	}
+
+	char * string = malloc(sizeof(char) * 10);
+	if(string == NULL) {
+		return 1;
+	}
+	server_receive(connection, string, (size_t) 10);
+
+	printf("%s\n", string);
 
 	server_disconnect(connection);
 

@@ -130,6 +130,18 @@ void server_disconnect(connection_t connection) {
 	}
 }
 
+int server_send(connection_t connection, const void * data, size_t size) {
+	network_t * network = (network_t *) connection;
+
+	return pipe_send(network->write, data, size);
+}
+
+int server_receive(connection_t connection, void * data, size_t size) {
+	network_t * network = (network_t *) connection;
+
+	return pipe_receive(network->read, data, size);
+}
+
 static connection_t mkserver(char * address, ...) {
 	network_t * network;
 	pipe_t read;

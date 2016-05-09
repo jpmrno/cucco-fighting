@@ -2,7 +2,6 @@
 #include <define.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
@@ -93,13 +92,13 @@ void pipe_close(pipe_t pipe) {
 	}
 }
 
-int pipe_send(pipe_t pipe, void * data, const int size) {
+int pipe_send(pipe_t pipe, const void * data, size_t size) {
 	npipe_t * npipe = (npipe_t *) pipe;
 
 	return write(npipe->channel, data, size);
 }
 
-int pipe_receive(pipe_t pipe, void * data, const int size) {
+int pipe_receive(pipe_t pipe, void * data, size_t size) {
 	npipe_t * npipe = (npipe_t *) pipe;
 
 	return read(npipe->channel, data, size);

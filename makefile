@@ -19,7 +19,7 @@ help:
 
 all: clean build
 
-build: libs server client database
+build: libs server client database logger
 
 libs:
 	$(MAKE) -C $@ all
@@ -35,10 +35,14 @@ client: libs
 database:
 	$(MAKE) -C $@ all
 
+logger:
+	$(MAKE) -C $@ all
+
 clean:
 	$(MAKE) -C libs clean
 	$(MAKE) -C server clean
 	$(MAKE) -C client clean
 	$(MAKE) -C database clean
+	$(MAKE) -C logger clean
 
-.PHONY: help all build libs server client database clean
+.PHONY: help all build libs server client database logger clean

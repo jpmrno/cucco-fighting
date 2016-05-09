@@ -3,7 +3,7 @@
 #include <sqlite3.h>
 #include <stdio.h> // TODO: Remove
 
-typedef struct sqlite3 dbsql_t;
+typedef sqlite3 dbsql_t;
 
 #define DATABASE_PATH_DEFAULT "database.sqlite"
 

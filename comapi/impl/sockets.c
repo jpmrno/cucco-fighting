@@ -49,7 +49,7 @@ connection_t server_open(const char * config_file) {
 
 	printf("Tengo: %s:%d\n", config->ip, config->port);
 
-	connection = mkserver(config->ip);
+	connection = mkserver(config->ip, config->port);
 
 	config_free(config);
 
@@ -93,7 +93,7 @@ connection_t server_connect(const char * config_file) {
 		return NULL;
 	}
 
-	connection = cserver(config->ip);
+	connection = cserver(config->ip, config->port);
 
 	config_free(config);
 

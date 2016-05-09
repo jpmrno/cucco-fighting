@@ -9,6 +9,8 @@
 #include <stdarg.h>
 #include <string.h>
 #include <strings.h>
+#include <stdio.h>
+#include <minIni.h>
 
 // http://www.beej.us/guide/bgnet/output/html/singlepage/bgnet.html
 
@@ -34,7 +36,7 @@ static config_t * config_new();
 static void config_free(config_t * config);
 
 static network_t * network_new(char * address, int sockfd, int port_n);
-static void network_rm(network_t * connection);
+static void network_free(network_t * connection);
 
 connection_t server_open(char * config_file) {
 	connection_t connection;
@@ -99,7 +101,7 @@ connection_t server_connect(char * config_file) {
 	return connection;
 }
 
-static connection_t c_mkserver(char * address, ...) {
+static connection_t mkserver(char * address, ...) {
 	network_t * network;
 	struct sockaddr_in socket_a;
 	int sockfd, port_n;
@@ -192,7 +194,7 @@ static config_t * config_new(const char * file) {
 		return NULL;
 	}
 
-	port = ini_geti("network", "port", PORT_DEFAULT, file);
+	port = (int) ini_getl("network", "port", PORT_DEFAULT, file);
 	if(ret <= 0) { // TODO: Validar nuero de puerto?
 		free(ip);
 		return NULL;
@@ -213,7 +215,7 @@ static config_t * config_new(const char * file) {
 }
 
 static void config_free(config_t * config) {
-	free(config->address);
+	free(config->ip);
 	free(config);
 }
 

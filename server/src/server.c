@@ -38,7 +38,7 @@ int main(int argc, char const * argv[]) {
 			ret = handle(connection_accepted);
 
 			server_close(connection_accepted);
-			exit(ret); // TODO: Porq no return 0?
+			exit(ret); // TODO: Porq no return ret;?
 		}
 
 		printf("(%d) Desconectando nueva conexion...\n", connection_numer);

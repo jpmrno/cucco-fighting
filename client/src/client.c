@@ -8,6 +8,7 @@ int main(int argc, char const * argv[]) {
 	connection_t connection;
 
 	if(argc != 2) {
+		// TODO: Default
 		printf("Falta archivo de configuracion.\n"); // TODO: perror()
 		return 1;
 	}

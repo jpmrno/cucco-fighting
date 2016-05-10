@@ -33,6 +33,7 @@ int db_shm()
     /*
      * Create the segment.
      */
+	//aca semaforo
     if ((shmid = shmget(key, SHMSZ, IPC_CREAT | 0666)) < 0) {
         printf("error alguno\n");
         return -1;
@@ -41,6 +42,7 @@ int db_shm()
     /*
      * Now we attach the segment to our data space.
      */
+	//aca semaforou
     if ((shm = shmat(shmid, NULL, 0)) == (char *) -1) {
        printf("otro error\n");
 	   return -1;

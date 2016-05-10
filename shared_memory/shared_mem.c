@@ -22,6 +22,7 @@ int start_shm(){
 	
 	key = 5678;
 	
+	//aca semaforo
     if ((shmid = shmget(key, SHMSZ, 0666)) < 0) {
         printf("error 1 de shm\n");
 		return -1;
@@ -34,6 +35,7 @@ int start_shm(){
 //      * Now we attach the segment to our data space.
 //      */
 	
+	//aca semaforo
 	if((shm = shmat(shmid, NULL, 0)) == (char*) -1){
 		printf("error 2 de shm\n");
 		return -1;

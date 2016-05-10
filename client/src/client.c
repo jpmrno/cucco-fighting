@@ -38,7 +38,16 @@ int main(int argc, char const * argv[]) {
 	}
 	server_receive(connection, string, (size_t) 10);
 
-	printf("%s\n", string);
+
+	while(1){
+		printf("%s\n", string);
+		
+		
+	}
+
+	
+
+
 
 	server_disconnect(connection);
 

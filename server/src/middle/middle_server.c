@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "../../../comapi/include/library.h"
 
+
 // las fucniones individuales del switch las podiramos separar, medio feo asi
 
 int process_request(data_t* data){
@@ -8,26 +9,38 @@ int process_request(data_t* data){
 	
 	switch(opt){
 		CASE LIST:{
-			listc_cucco_t* list_struct = malloc(sizeof(list_cucco_t));
+			list_cucco_t* list_struct = malloc(sizeof(list_cucco_t));
 			if(list_struct ==  NULL){
 				return -1;
 			}
 			
-			list_struct-> count = getCuccoAmount();
-			list_struct-> cucco_list = getCuccos();
+			//estas fucniones habria que reemplazarlas por las que llaman a la base de datos!
+			list_struct-> count = getCuccoAmount(); //////
+			list_struct-> cucco_list = getCuccos();	//////
 			data->dataStruct = malloc(sizeof(list_cucco_t));
 			if(data->dataStruct == null){
 				return -1;
 			}
-			memcpy(data->dataStruct, list_struct, sizeof(list_struct));
+			memcpy(data->dataStruct, (void*)list_struct, sizeof(list_struct));
 			//aca habria que enviar la respuesta, buscar la funcion que hace eso yver que devuelve, si lo hizo con exito o no
 			break;		
 		}
-		CASE BET:{
+		CASE BET:{ //no se si hace falta hacer esta ufncion bet y copiarla me parece que alcanza con castearla desde data directo habria que corroborar... no me acuerdo nada de pi -_-
+			money_t * bet = malloc(sizeof(money_t));
+			if(bet == NULL){
+				return -1;
+			}
+			memcpy(bet, (money_t) data->dataStruct, sizeof(money_t));
 			
+			//funcion de base de datos dependiendo que pasa es que devuelvo me imagino
+			bet(bet->username, bet->money);
+			
+			
+			//idem de respuesta de case list
 			break;
 		}
 		CASE WALLET:{
+			
 			
 			break;
 		}

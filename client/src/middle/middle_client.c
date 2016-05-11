@@ -26,7 +26,7 @@ int reset_money(char* username){
 	data->opcode = KACHING;
 	user_t* user = malloc(sizeof(user_t));
 	user->username = username;
-	memcpy(data->dataStruct, user, sizeof(user_t));
+	memcpy(data->dataStruct, (void*)user, sizeof(user_t));
 	return send_rcv();
 }
 
@@ -43,7 +43,7 @@ list_cucco_t* list_cuccos(){
 	list_cucco_t* list = malloc(sizeof(list_cucco_t));
 	if(list == NULL)
 		return NULL;
-	memcpy(list, data->dataStruct, sizeof(list_cucco_t));\
+	memcpy(list, (list_cucco_t*) data->dataStruct, sizeof(list_cucco_t));\
 	free(data);
 	return list;
 }
@@ -55,7 +55,7 @@ int get_money(char* username){
 	if(user == NULL){
 		return -1;
 	}
-	memcpy(data->dataStruct, user, sizeof(user_t));
+	memcpy(data->dataStruct, (void*) user, sizeof(user_t));
 	int rcv = send_rcv();
 	if(rcv == -1)
 		return -1;
@@ -71,7 +71,7 @@ int bet(char* cucco, double money, char* username){
 	bet->bet = money;
 	bet->username = username;
 	data->opcode = BET;
-	memcpy(data->dataStruct, bet, sizeof(bet_t));
+	memcpy(data->dataStruct, (void*) bet, sizeof(bet_t));
 	return send_rcv();
 }
 

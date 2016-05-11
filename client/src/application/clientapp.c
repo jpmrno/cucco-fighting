@@ -2,12 +2,17 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <strings.h>
+#include "../../../comapi/include/comapi.h"
 #include "options.h"
+#include "../middle/middle_client.h"
 
 void intro();
 void signInOptions();
 void menu();
 void printHelp();
+
+//VER DE PASARLO POR PARAMETRO SIEMPRE ESO NO LO HACEMOS BIEN
+static char* username;
 
 //lado pi
 int main(void){
@@ -38,17 +43,23 @@ void menu(){
 
 			if(strcmp(buffer,"list\n") == 0){
 				printf("cucko1cuccccccc\n");
+				
 			}else if (strcmp(buffer, "bet\n") == 0){
 				//funcion apostar
+				
 			}else if(strcmp(buffer, "wallet\n") == 0){
-				//muestra plata
+				getMoney(username);
+				
 			}else if(strcmp(buffer, "kaching\n") == 0){
-				kaching();
+				kaching(username);
+				
 			}else if((strcmp(buffer, "help\n")) == 0 || (strcmp(buffer, "man\n")) == 0){
 				printHelp();
+				
 			}else if(strcmp(buffer, "exit\n")== 0){
 				alive = 0;
 				//matar servidor
+				
 			}else{
 				printf("Invalid command\n");
 			}	
@@ -65,6 +76,7 @@ void printHelp(){
 	
 	printf("-list: Shows the list of cuccos that are available for a fight.\n");
 	printf("-bet: Bet on a specific cucco money.\n");
+	printf("-wallet: Get amount of money you have.\n");
 	printf("-kaching: Reset amount of money, to 50 cuccope$o$.\n");
 	printf("-help: See this menu.\n");
 	printf("-exit: Exit.\n");

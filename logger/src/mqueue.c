@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#define MESSAGE_SIZE_MAX 128
-
 #define PERMISSIONS 0666
 #define FLAGS_MAKE IPC_CREAT | IPC_EXCL
 #define FLAGS_OPEN 0
@@ -16,11 +14,6 @@ typedef struct {
 	key_t key;
 	int id;
 } mq_t;
-
-typedef struct {
-	long type;
-	char message[MESSAGE_SIZE_MAX];
-} message_t;
 
 static mq_t * mq_new(int owner, key_t key, int id);
 static void mq_free(mq_t * mqueue);

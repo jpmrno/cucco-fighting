@@ -39,6 +39,7 @@ list_cucco_t* list_cuccos(){
 		return NULL;
 	}
 	list_cucco_t* list = malloc(sizeof(list_cucco_t));
+	
 	if(list == NULL)
 		return NULL;
 	list = data->cucco_list;

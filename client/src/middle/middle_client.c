@@ -3,14 +3,11 @@
 #include <string.h>
 #include "../../../comapi/include/library.h"
 
-
-
 static data_t* data;
 //static connection_t connection;
 static char* config_file;
 
 int send_rcv(){
-	
 	connection_t c =  server_connect(config_file);
 	int send = server_send(c, (void*)data, sizeof(data_t));
 	if(send == -1)
@@ -23,25 +20,34 @@ int send_rcv(){
 }
 
 int reset_money(char* username){
+	data=malloc(sizeof(data_t));
+	if(data == NULL)
+		return -1;
 	data->opcode = KACHING;
 	data->dataStruct = (void*) username;
 	return send_rcv();
 }
 
-char** list_cuccos(){
+list_cucco_t* list_cuccos(){
 	data = malloc(sizeof(data_t));
+	if(data == NULL)
+		return NULL;
 	data->opcode = LIST;
 	data->dataStruct = NULL;
 	int rcv = send_rcv();
 	if(rcv == -1){
 		return NULL;
 	}
-	list_cucco_t list = malloc(sizeof(list_cucco_t));
-	memcpy(list, data->dataStruct, sizeof(list_cucco_t));	
+	list_cucco_t* list = malloc(sizeof(list_cucco_t));
+	if(list == NULL)
+		return NULL;
+	list = data->cucco_list;
 	free(data);
-	char** listacucc = list->cucco_list;
-	free(list);
-	return listacucc;
+	return list;
+	// memcpy(list, data->dataStruct, sizeof(list_cucco_t));
+	// free(data);
+	// free(list);
+	// return listacucc;
 }
 
 int get_money(char* username){
@@ -56,14 +62,12 @@ int get_money(char* username){
 
 int bet(char* cucco, double money, char* username){
 	data = malloc(sizeof(data_t));
-	bet_t bet = malloc(sizeof(bet_t));
-	if( data == NULL || bet == NULL)
-		return -1;
+	bet_t bet;
 	bet.cucco_name = cucco;
 	bet.bet = money;
 	bet.username = username;
 	data->opcode = BET;
-	data->dataStruct = bet;
+	data->dataStruct = (void*) &bet;
 	return send_rcv();
 }
 

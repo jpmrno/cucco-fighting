@@ -42,7 +42,7 @@ void menu(){
 			fgets(buffer, 255, stdin);
 
 			if(strcmp(buffer,"list\n") == 0){
-				printf("cucko1cuccccccc\n");
+				printCuccoList();
 				
 			}else if (strcmp(buffer, "bet\n") == 0){
 				//funcion apostar

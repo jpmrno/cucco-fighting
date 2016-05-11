@@ -1,5 +1,4 @@
 
-c
 // ---[ Data packages ]-----------------------------------
 
 typedef enum{
@@ -27,6 +26,7 @@ typedef struct{
 }login_t;
 
 typedef struct{
+	int count;
 	char** cucco_list;
 }list_cucco_t;
 

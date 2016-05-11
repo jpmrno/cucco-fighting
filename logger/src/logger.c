@@ -1,9 +1,16 @@
 #include <logger.h>
+#include <define.h>
+#include <mqueue.h>
 #include <stdio.h>
 #include <strings.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #define USAGE_STRING "Usage: 'logger.app <stdout/file> [file_path]'.\n"
+
+static void handle_int(int sign);
+
+static mqueue_t mqueue;
 
 int main(int argc, char const * argv[]) {
 	const char * file_path;
@@ -39,6 +46,20 @@ int main(int argc, char const * argv[]) {
 		// ret = logger_file(file_path);
 	}
 
+	mqueue = mq_make(1234);
+	if(mqueue == NULL) {
+		fprintf(stderr, "No se pudo crear la message queue.");
+		exit(EXIT_FAILURE);
+	}
+
+	signal(SIGINT, handle_int);
+
+	while(TRUE) {
+
+	}
+
+	mq_remove(mqueue);
+
 	return 0;
 }
 
@@ -54,3 +75,10 @@ int main(int argc, char const * argv[]) {
 // 		return FALSE;
 // 	}
 // }
+
+static void handle_int(int sign) {
+	if(sign == SIGINT) {
+		mq_remove(mqueue);
+		exit(EXIT_FAILURE);
+	}
+}

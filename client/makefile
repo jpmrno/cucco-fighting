@@ -3,31 +3,27 @@ include ../makevars
 # --[ Vars ]------------------ #
 TARGET = client.app
 SRC_C = src
-SRC_HEADERS = ../$(LIBS_HEADERS) include
+SRC_HEADERS = ../$(LIBS_HEADERS) include ../comapi
 SRC_LIBS = ../$(LIBS_PATH)
+SRC_API = ../comapi
+SRC_IMPL = $(SRC_API)/impl
 LIBS = random ini
+GCC_FLAGS += -DCLIENT
+# ---------------------------- #
 
-SRC_API_C = ../comapi
-SRC_API_HEADERS = ../comapi
-SRC_API_IMPL = ../comapi/impl/$(impl).c
-
+# --[ Cond ]------------------ #
 ifeq ($(impl), pipes)
 LIBS += pipes
-else
-ifeq ($(impl), sockets)
-LIBS +=
-else
-SRC_API_IMPL = $(wildcard $(SRC_API_C)/impl/*.c)
-endif
 endif
 # ---------------------------- #
 
 SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
-SOURCES += $(wildcard $(SRC_API_C)/*.c)
-SOURCES += $(SRC_API_IMPL)
+SOURCES += $(wildcard $(SRC_API)/*.c)
 OBJECTS = $(SOURCES:.c=.o)
 
-SRC_HEADERS += $(SRC_API_HEADERS)
+SOURCES_IMPL = $(SRC_IMPL)/$(impl).c
+OBJECTS_IMPL = $(SOURCES_IMPL:.c=.o)
+
 HEADERS = $(foreach HEADER,$(SRC_HEADERS),-I $(HEADER))
 
 SOURCE_LIBS = $(foreach SRC_LIB,$(SRC_LIBS),-L $(SRC_LIB))
@@ -35,9 +31,9 @@ DEPS = $(foreach LIB,$(LIBS),-l $(LIB))
 
 all: $(TARGET)
 
-$(TARGET): $(OBJECTS)
+$(TARGET): $(OBJECTS) $(OBJECTS_IMPL)
 	$(GCC) $(GCC_FLAGS) $(HEADERS) -o $@ $^ $(SOURCE_LIBS) $(DEPS)
-	rm -f $(OBJECTS)
+	rm -f $(OBJECTS_IMPL)
 
 %.o: %.c
 	$(GCC) $(GCC_FLAGS) $(HEADERS) -c $< -o $@ $(SOURCE_LIBS) $(DEPS)

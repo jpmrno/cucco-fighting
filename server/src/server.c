@@ -96,6 +96,7 @@ static int handle(connection_t connection) {
 static void handle_int(int sign) {
 	if(sign == SIGINT) {
 		server_close(connection);
+		exit(EXIT_FAILURE);
 	} else if(sign == SIGCHLD) {
 		int status;
 

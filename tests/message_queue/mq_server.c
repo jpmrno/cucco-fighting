@@ -1,13 +1,15 @@
-#include <sys/ipc.h>
-#include <sys/msg.h> 
-#include <stdio.h>
 #include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <stdio.h>
 #include <string.h>
 
-typedef struct msgbuf {
-    long mtype;       /* message type, must be > 0 */
-    char mtext[128];    /* message data */
-}msgbuf;
+#define BUFFER_SIZE_MAX 128
+
+typedef struct {
+	long mtype;       /* message type, must be > 0 */
+	char mtext[BUFFER_SIZE_MAX];    /* message data */
+} msgbuf;
 
 int create_msq();
 int send_message(int mtype, char* msg);
@@ -20,79 +22,194 @@ int recieve_msg();
 // 	/* msgflg argument must be an octal integer with settings for the queue's permissions and control flags.*/
 //
 
-static int msqid;
-static int msgflg = IPC_CREAT | 0666;
+int mq_create(key_t key) {
+	int msqid;
 
-int main(void){
-	create_msq();
-	
-	send_message(1, "holalalala");
-	send_message(1, "chauauauau");
-	send_message(1, "queueueueu");
-	send_message(1, "aprobamof3");
-	send_message(1, "eeeeeeeeee(como gaston)");
+	msqid = msgget(key, IPC_CREAT | IPC_EXCL | 0666);
+	if(msqid == -1) {
+   		return -1;
+   	}
 
-	while(1){
-		recieve_msg();
-	}	
+	return msqid;
 }
 
-int create_msq(){
+int mq_open(key_t key) {
+	int msqid;
 
-	int msgflg;
-	key_t key = 1234;
-
-	if ((msqid = msgget(key, msgflg)) == -1)
-  	{
-		printf("se cago todo\n");
-    	perror("msgget: msgget failed");
+	msqid = msgget(key, 0666);
+	if(msqid == -1) {
    		return -1;
-   	} else
-		printf("message queue identifier: %d\n", msqid);
+   	}
 
 	return msqid;
 }
 
 
-int send_message(int mtype, char* msg){
-	msgbuf sbuf;
-	sbuf.mtype = mtype;
-	strcpy(sbuf.mtext, msg);
-	
-	if(msgsnd(msqid, &sbuf, 128, msgflg) < 0){
-		printf("se cago todo enviando\n");
-		return -1;
-	}else{
-		printf("se envio el mensaje /o_o/\n");
-	}
+int mq_send(int msqid, int mtype, char * msg) {
+	msgbuf buffer;
 
-	return 0;
-	
+	buffer.mtype = mtype;
+	strcpy(buffer.mtext, msg);
+
+	return msgsnd(msqid, &buffer, BUFFER_SIZE_MAX, msgflg); // TODO: Flags?
 }
 
-int recieve_msg(){
-	key_t key = 1234;
-	
-	printf("entre al recieve\n");
-	
-	msgbuf rbuf;
-	
-    if ((msqid = msgget(key, 0666)) < 0) {
-        printf("recibi mal del lado del logger\n");
-		return -1;
-    }
-	
-	if(msgrcv(msqid, &rbuf, 128, 1, 0) < 0){
-		printf("recibi mal en el segundo lugar del logger\n");
-		return -1;
-	}
-	
-	printf("%s\n", rbuf.mtext);
-	return 0;
-	
+msgbuf mq_receive(int msqid, char * msg){
+	msgbuf buffer;
+
+	return msgrcv(msqid, buffer, BUFFER_SIZE_MAX, 1, msgflg);
 }
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#ifndef _MQUEUE_H_
+#define _MQUEUE_H_
+
+struct mq_t;
+typedef struct mq_t * mqueue_t;
+
+mqueue_t mq_make(const char * name);
+void mq_remove(mqueue_t mqueue);
+mqueue_t mq_connect(const char * name);
+void mq_disconnect(mqueue_t mqueue);
+
+#endif
+
+
+
+
+
+
+
+
+
+#include <mqueue.h>
+#include <define.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+
+#define MESSAGES_MAX
+#define MESSAGE_SIZE_MAX
+
+#define PERMISSIONS 0666
+#define FLAGS_MAKE O_RDONLY | O_CREAT | O_EXCL
+#define FLAGS_OPEN O_WRONLY
+
+typedef struct {
+	char * name;
+	mqd_t queue;
+} mq_t;
+
+static mqueue_t * mq_new(char * name, mqd_t queue);
+static void mq_free(mqueue_t * mqueue);
+
+mqueue_t mq_make(const char * name) {
+	mq_t * mqueue;
+	mqd_t queue;
+	struct mq_attr attrs;
+
+	attrs.mq_flags = 0;						// message queue flags. Flags: 0 or O_NONBLOCK
+	attrs.mq_maxmsg = MESSAGES_MAX;			// maximum number of messages
+	attrs.mq_msgsize = MESSAGE_SIZE_MAX;	// maximum message size
+	attrs.mq_curmsgs = 0;					// number of messages currently queued
+
+	queue = mq_open(name, FLAGS_MAKE, PERMITIONS, &attrs);
+	if(queue == -1) {
+		mq_unlink(name);
+		return NULL;
+	}
+
+	mqueue = mq_new(name, queue);
+	if(mqueue == NULL) {
+		mq_close(queue);
+		mq_unlink(name);
+		return NULL;
+	}
+
+	return (mqueue_t) mqueue;
+}
+
+void mq_remove(mqueue_t mqueue) {
+	mq_t * mq = (mq_t *) mqueue;
+
+	if(mq != NULL) {
+		if(mq->owner) {
+			mq_unlink(mq->name);
+		}
+		mq_disconnect(mq);
+	}
+}
+
+mqueue_t * mq_connect(const char * name) {
+	mq_t * mqueue;
+	mqd_t queue;
+
+	queue = mq_open(name, FLAGS_OPEN);
+	if(queue == -1) {
+		return NULL;
+	}
+
+	mqueue = mq_new(name, queue);
+	if(mqueue == NULL) {
+		mq_close(queue);
+		return NULL;
+	}
+
+	return (mqueue_t) mqueue;
+}
+
+void mq_disconnect(mqueue_t mqueue) {
+	mq_t * mq = (mq_t *) mqueue;
+
+	if(mq != NULL) {
+		mq_close(mq->queue);
+		mq_free(mq);
+	}
+}
+
+static mq_t * mq_new(char * name, mqd_t queue) {
+	mq_t * mqueue;
+
+	mqueue = malloc(sizeof(mqueue_t));
+	if(mqueue == NULL) {
+		return NULL;
+	}
+
+	mqueue->name = malloc(sizeof(char) * strlen(name));
+	if(mqueue->name == NULL) {
+		free(mqueue);
+		return NULL;
+	}
+
+	strcpy(mqueue->name, name);
+	mqueue->queue = queue;
+
+	return mqueue;
+}
+
+static void mq_free(mq_t * mqueue) {
+	if(mqueue != NULL) {
+		free(mqueue->name);
+		free(mqueue);
+	}
+}
 

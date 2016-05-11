@@ -54,5 +54,6 @@ int main(int argc, char const * argv[]) {
 static void handle_int(int sign) {
 	if(sign == SIGINT) {
 		server_disconnect(connection);
+		exit(EXIT_FAILURE);
 	}
 }

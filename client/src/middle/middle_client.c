@@ -24,7 +24,9 @@ int reset_money(char* username){
 	if(data == NULL)
 		return -1;
 	data->opcode = KACHING;
-	data->dataStruct = (void*) username;
+	user_t* user = malloc(sizeof(user_t));
+	user->username = username;
+	memcpy(data->dataStruct, user, sizeof(user_t));
 	return send_rcv();
 }
 
@@ -39,36 +41,37 @@ list_cucco_t* list_cuccos(){
 		return NULL;
 	}
 	list_cucco_t* list = malloc(sizeof(list_cucco_t));
-	
 	if(list == NULL)
 		return NULL;
-	list = data->cucco_list;
+	memcpy(list, data->dataStruct, sizeof(list_cucco_t));\
 	free(data);
 	return list;
-	// memcpy(list, data->dataStruct, sizeof(list_cucco_t));
-	// free(data);
-	// free(list);
-	// return listacucc;
 }
 
 int get_money(char* username){
 	data = malloc(sizeof(data_t));
 	data->opcode = WALLET;
-	data->dataStruct = (void*) username;
+	user_t* user = malloc(sizeof(user_t));
+	if(user == NULL){
+		return -1;
+	}
+	memcpy(data->dataStruct, user, sizeof(user_t));
 	int rcv = send_rcv();
 	if(rcv == -1)
 		return -1;
-	return *((int*)data->dataStruct);
+	
+	//revisar esto chicos aver si les parece que anda o flashie tomates
+	return (money_t) data->dataStruct.money;
 }
 
 int bet(char* cucco, double money, char* username){
 	data = malloc(sizeof(data_t));
-	bet_t bet;
-	bet.cucco_name = cucco;
-	bet.bet = money;
-	bet.username = username;
+	bet_t* bet = malloc(sizeof(bet_t));
+	bet->cucco_name = cucco;
+	bet->bet = money;
+	bet->username = username;
 	data->opcode = BET;
-	data->dataStruct = (void*) &bet;
+	memcpy(data->dataStruct, bet, sizeof(bet_t));
 	return send_rcv();
 }
 

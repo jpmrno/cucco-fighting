@@ -23,7 +23,7 @@ typedef struct{
 
 typedef struct{
 	char* username;
-}login_t;
+}user_t;
 
 typedef struct{
 	int count;

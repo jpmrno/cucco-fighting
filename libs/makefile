@@ -1,6 +1,6 @@
 include ../makevars
 
-LIBS = ini pipes random
+LIBS = ini pipes random serial
 
 all:
 	$(foreach LIB, $(LIBS), $(MAKE) -C $(LIB) all;)

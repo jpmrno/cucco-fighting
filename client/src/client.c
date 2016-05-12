@@ -1,6 +1,6 @@
 #include <client.h>
 #include <define.h>
-#include <comapi.h>
+#include <clib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -14,6 +14,7 @@ static connection_t connection = NULL;
 
 int main(int argc, char const * argv[]) {
 	const char * config_file;
+	int ret;
 
 	switch(argc) {
 		case 1: {
@@ -38,13 +39,11 @@ int main(int argc, char const * argv[]) {
 
 	signal(SIGINT, handle_int);
 
-	char * string = malloc(sizeof(char) * 10);
-	if(string == NULL) {
-		return 1;
+	ret = login(connection, "Juan");
+	if(!ret) {
+		fprintf(stderr, "No se pudo loguear al servidor.\n");
+		server_disconnect(connection);
 	}
-	server_receive(connection, string, (size_t) 10);
-
-	printf("%s\n", string);
 
 	server_disconnect(connection);
 

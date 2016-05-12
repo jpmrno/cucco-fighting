@@ -1,4 +1,5 @@
 #include <server.h>
+#include <slib.h>
 #include <define.h>
 #include <comapi.h>
 #include <stdio.h>
@@ -80,17 +81,12 @@ int main(int argc, char const * argv[]) {
 }
 
 static int handle(connection_t connection) {
-	int random;
+	if(!login(connection)) {
+		printf("Error en el login...\n");
+		return FALSE;
+	}
 
-	srand(time(NULL)+(time_t)&random);
-	random = rand()%10;
-	printf("(%d) Me pude conectar!\n", random);
-	sleep(random);
-
-	static char * string = "HOLA!";
-	server_send(connection, string, (size_t) 6);
-
-	return 0;
+	return TRUE;
 }
 
 static void handle_int(int sign) {

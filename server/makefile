@@ -7,7 +7,7 @@ SRC_HEADERS = ../$(LIBS_HEADERS) include ../comapi
 SRC_LIBS = ../$(LIBS_PATH)
 SRC_API = ../comapi
 SRC_IMPL = $(SRC_API)/impl
-LIBS = random ini
+LIBS = random ini serial
 GCC_FLAGS += -DSERVER
 # ---------------------------- #
 
@@ -33,7 +33,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJECTS) $(OBJECTS_IMPL)
 	$(GCC) $(GCC_FLAGS) $(HEADERS) -o $@ $^ $(SOURCE_LIBS) $(DEPS)
-	rm -f $(OBJECTS_IMPL)
+	rm -f $(OBJECTS) $(OBJECTS_IMPL)
 
 %.o: %.c
 	$(GCC) $(GCC_FLAGS) $(HEADERS) -c $< -o $@ $(SOURCE_LIBS) $(DEPS)

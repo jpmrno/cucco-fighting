@@ -78,7 +78,7 @@ connection_t server_accept(connection_t connection) {
 
 	nnetwork = network_new(network->address, sockfd, network->port);
 	if(nnetwork == NULL) {
-		close(sockfd);
+		close(sockfd);=
 		return NULL;
 	}
 

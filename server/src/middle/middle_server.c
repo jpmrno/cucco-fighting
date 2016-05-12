@@ -26,13 +26,12 @@ int process_request(data_t* data){
 			break;		
 		}
 		CASE BET:{ //no se si hace falta hacer esta ufncion bet y copiarla me parece que alcanza con castearla desde data directo habria que corroborar... no me acuerdo nada de pi -_-
-			money_t * bet = malloc(sizeof(money_t));
+			money_t * bet = (money_t) data->dataStruct;
 			if(bet == NULL){
 				return -1;
 			}
-			memcpy(bet, (money_t) data->dataStruct, sizeof(money_t));
 			
-			//funcion de base de datos dependiendo que pasa es que devuelvo me imagino
+			//funcion de base de datos, dependiendo que pasa en esta fucnion es que devuelvo me imagino
 			bet(bet->username, bet->money);
 			
 			

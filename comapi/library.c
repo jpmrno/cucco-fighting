@@ -10,14 +10,18 @@ static int receive(connection_t connection, void ** buffer, int * size);
 
 int write_i(connection_t connection, int value) {
 	void * buffer;
-	int size;
+	int size, ret;
 
 	if(tpl_jot(TPL_MEM, &buffer, &size, "i", &value) == -1) {
 		printf("TPLS ERROR\n");
 		return ERROR_TPL;
 	}
 
-	return send(connection, buffer, size);
+	ret = send(connection, buffer, size);
+
+	free(buffer);
+
+	return ret;
 }
 
 int read_i(connection_t connection, int * value) {
@@ -31,7 +35,7 @@ int read_i(connection_t connection, int * value) {
 	}
 
 	node = tpl_map("i", value);
-	if(tpl_load(node, TPL_MEM, buffer, size) == -1) {
+	if(tpl_load(node, TPL_MEM | TPL_UFREE, buffer, size) == -1) {
 		printf("TPLR ERROR\n");
 		return ERROR_TPL;
 	}
@@ -43,14 +47,18 @@ int read_i(connection_t connection, int * value) {
 
 int write_sf(connection_t connection, char * string, double value) {
 	void * buffer;
-	int size;
+	int size, ret;
 
 	if(tpl_jot(TPL_MEM, &buffer, &size, "sf", &string, &value) == -1) {
 		printf("TPLS ERROR\n");
 		return ERROR_TPL;
 	}
 
-	return send(connection, buffer, size);
+	ret = send(connection, buffer, size);
+
+	free(buffer);
+
+	return ret;
 }
 
 int read_sf(connection_t connection, char ** string, double * value) {
@@ -64,7 +72,7 @@ int read_sf(connection_t connection, char ** string, double * value) {
 	}
 
 	node = tpl_map("sf", string, value);
-	if(tpl_load(node, TPL_MEM, buffer, size) == -1) {
+	if(tpl_load(node, TPL_MEM | TPL_UFREE, buffer, size) == -1) {
 		printf("TPLR ERROR\n");
 		return ERROR_TPL;
 	}
@@ -77,14 +85,18 @@ int read_sf(connection_t connection, char ** string, double * value) {
 
 int write_s(connection_t connection, char * string) {
 	void * buffer;
-	int size;
+	int size, ret;
 
 	if(tpl_jot(TPL_MEM, &buffer, &size, "s", &string) == -1) {
 		printf("TPLS ERROR\n");
 		return ERROR_TPL;
 	}
 
-	return send(connection, buffer, size);
+	ret = send(connection, buffer, size);
+
+	free(buffer);
+
+	return ret;
 }
 
 int read_s(connection_t connection, char ** string) {
@@ -98,7 +110,7 @@ int read_s(connection_t connection, char ** string) {
 	}
 
 	node = tpl_map("s", string);
-	if(tpl_load(node, TPL_MEM, buffer, size) == -1) {
+	if(tpl_load(node, TPL_MEM | TPL_UFREE, buffer, size) == -1) {
 		printf("TPLR ERROR\n");
 		return ERROR_TPL;
 	}
@@ -111,14 +123,18 @@ int read_s(connection_t connection, char ** string) {
 
 int write_d(connection_t connection, double value) {
 	void * buffer;
-	int size;
+	int size, ret;
 
 	if(tpl_jot(TPL_MEM, &buffer, &size, "f", &value) == -1) {
 		printf("TPLS ERROR\n");
 		return ERROR_TPL;
 	}
 
-	return send(connection, buffer, size);
+	ret = send(connection, buffer, size);
+
+	free(buffer);
+
+	return ret;
 }
 
 int read_d(connection_t connection, double * value) {
@@ -132,7 +148,7 @@ int read_d(connection_t connection, double * value) {
 	}
 
 	node = tpl_map("f", value);
-	if(tpl_load(node, TPL_MEM, buffer, size) == -1) {
+	if(tpl_load(node, TPL_MEM | TPL_UFREE, buffer, size) == -1) {
 		printf("TPLR ERROR\n");
 		return ERROR_TPL;
 	}

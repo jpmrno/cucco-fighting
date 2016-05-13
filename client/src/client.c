@@ -51,6 +51,36 @@ int main(int argc, char const * argv[]) {
 		server_disconnect(connection);
 	}
 
+	ret = cucco_add(connection, "La mas rapida");
+	if(!ret) {
+		fprintf(stderr, "No se pudo addear al servidor.\n");
+		server_disconnect(connection);
+	}
+
+	ret = cucco_remove(connection, "La mas rapida");
+	if(!ret) {
+		fprintf(stderr, "No se pudo remove al servidor.\n");
+		server_disconnect(connection);
+	}
+
+	// ret = list(connection);
+	// if(!ret) {
+	// 	fprintf(stderr, "No se pudo listear al servidor.\n");
+	// 	server_disconnect(connection);
+	// }
+
+	ret = bet(connection, "La mas rapida", 20.4);
+	if(!ret) {
+		fprintf(stderr, "No se pudo bettear al servidor.\n");
+		server_disconnect(connection);
+	}
+
+	ret = reset(connection);
+	if(!ret) {
+		fprintf(stderr, "No se pudo resetear al servidor.\n");
+		server_disconnect(connection);
+	}
+
 	ret = logout(connection);
 	if(!ret) {
 		fprintf(stderr, "No se pudo logoutear al servidor.\n");

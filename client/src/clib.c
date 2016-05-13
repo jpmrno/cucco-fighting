@@ -125,6 +125,22 @@ int cucco_remove(connection_t connection, char * cucco) {
 	return value;
 }
 
+int list(connection_t connection, char *** list, int * length) {
+	int ret;
+
+	if(connection == NULL) {
+		printf("LIST ERROR\n");
+		return ERROR_CONNECTION;
+	}
+
+	ret = opcode(connection, LIST);
+	if(ret < OK) {
+		return ret;
+	}
+
+	return read_sa(connection, list, length);
+}
+
 int bet(connection_t connection, char * cucco, double money) {
 	int ret, value;
 

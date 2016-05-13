@@ -124,6 +124,21 @@ int cucco_remove(connection_t connection) {
 	return value;
 }
 
+int list(connection_t connection) {
+	if(connection == NULL) {
+		printf("LIST ERROR\n");
+		return ERROR_CONNECTION;
+	}
+
+	printf("(LIST)\n");
+
+	// TODO:
+	char * cuccos[5] = {"Cucco 1", "Cucco 2", "Cucco 3", "Cucco 4", "Cucco 5"};
+	int length = 3;
+
+	return write_sa(connection, cuccos, length);
+}
+
 int bet(connection_t connection) {
 	char * cucco;
 	double money;

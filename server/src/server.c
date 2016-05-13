@@ -134,6 +134,13 @@ static int run(connection_t connection, int op) {
 			}
 		} break;
 
+		case LIST: {
+			if(list(connection)) {
+				printf("Error en el list...\n");
+				return FALSE;
+			}
+		} break;
+
 		case BET: {
 			if(!bet(connection)) {
 				printf("Error en el bet...\n");

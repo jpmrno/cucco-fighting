@@ -9,6 +9,7 @@ int login(connection_t connection);
 int money(connection_t connection);
 int cucco_add(connection_t connection);
 int cucco_remove(connection_t connection);
+int list(connection_t connection);
 int bet(connection_t connection);
 int reset(connection_t connection);
 int logout(connection_t connection);

@@ -78,7 +78,6 @@ int read_sf(connection_t connection, char ** string, double * value) {
 	}
 	tpl_unpack(node, 0);
 	tpl_free(node);
-	// TODO: Errors tpl
 
 	return OK;
 }
@@ -116,7 +115,56 @@ int read_s(connection_t connection, char ** string) {
 	}
 	tpl_unpack(node, 0);
 	tpl_free(node);
-	// TODO: Errors tpl
+
+	return OK;
+}
+
+int write_sa(connection_t connection, char ** list, int length) {
+	void * buffer;
+	int size, ret;
+
+	if(tpl_jot(TPL_MEM, &buffer, &size, "s#", list, length) == -1) {
+		printf("TPLS ERROR\n");
+		return ERROR_TPL;
+	}
+
+	ret = write_i(connection, length);
+	if(ret < OK) {
+		free(buffer);
+		return ret;
+	}
+
+	ret = send(connection, buffer, size);
+	if(ret < 0) {
+		printf("ERROR SEND\n");
+	}
+
+	free(buffer);
+
+	return ret;
+}
+
+int read_sa(connection_t connection, char *** string, int * length) {
+	tpl_node * node;
+	void * buffer;
+	int size, ret;
+
+	ret = read_i(connection, length);
+	if(ret < OK) {
+		return ret;
+	}
+
+	ret = receive(connection, &buffer, &size);
+	if(ret < OK) {
+		printf("ERROR RECEIVE\n");
+		return ret;
+	}
+
+	*string = malloc(sizeof(char*) * (*length));
+	node = tpl_map("s#", *string, (*length));
+	tpl_load(node, TPL_MEM | TPL_UFREE, buffer, size);
+	tpl_unpack(node, 0);
+	tpl_free(node);
 
 	return OK;
 }
@@ -154,7 +202,6 @@ int read_d(connection_t connection, double * value) {
 	}
 	tpl_unpack(node, 0);
 	tpl_free(node);
-	// TODO: Errors tpl
 
 	return OK;
 }

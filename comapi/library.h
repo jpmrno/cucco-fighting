@@ -80,4 +80,7 @@ int read_s(connection_t connection, char ** string);
 int write_d(connection_t connection, double value);
 int read_d(connection_t connection, double * value);
 
+int write_sa(connection_t connection, char ** string, int length);
+int read_sa(connection_t connection, char *** string, int * length);
+
 #endif

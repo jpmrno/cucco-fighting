@@ -63,11 +63,17 @@ int main(int argc, char const * argv[]) {
 		server_disconnect(connection);
 	}
 
-	// ret = list(connection);
-	// if(!ret) {
-	// 	fprintf(stderr, "No se pudo listear al servidor.\n");
-	// 	server_disconnect(connection);
-	// }
+	char ** cuccos; // Remember to free! // TODO: Remove
+	int length; // TODO: Remove
+	ret = list(connection, &cuccos, &length);
+	if(ret) {
+		fprintf(stderr, "No se pudo listear al servidor.\n");
+		server_disconnect(connection);
+	}
+	int j; // TODO: Remove
+	for(j=0;j<length;j++) { // TODO: Remove
+		printf("%s\n", cuccos[j]);
+	}
 
 	ret = bet(connection, "La mas rapida", 20.4);
 	if(!ret) {

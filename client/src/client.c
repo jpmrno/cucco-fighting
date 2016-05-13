@@ -39,7 +39,7 @@ int main(int argc, char const * argv[]) {
 
 	signal(SIGINT, handle_int);
 
-	ret = login(connection, "Juan");
+	ret = money(connection);
 	if(!ret) {
 		fprintf(stderr, "No se pudo loguear al servidor.\n");
 		server_disconnect(connection);

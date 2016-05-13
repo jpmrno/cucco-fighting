@@ -1,9 +1,9 @@
 #include <clib.h>
 #include <define.h>
 #include <library.h>
-#include <tpl.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <stdio.h> // TODO: Remove
+
+static int opcode(connection_t connection, opcode_t op);
 
 // static connection_t connection = NULL;
 
@@ -25,319 +25,174 @@
 // 	server_disconnect(connection);
 // }
 
-static void opcode(int op);
-
-static void opcode(opcode_t op) {
-	void * buffer;
-	int size;
-
-	if(tpl_jot(TPL_MEM, &buffer, &size, "i", &op) == -1) {
-		printf("2) ERROR\n");
-		return FALSE;
-	}
-
-	if(server_send(connection, &size, sizeof(int)) == -1) {
-		printf("3) ERROR\n");
-		return FALSE;
-	}
-
-	if(server_send(connection, buffer, size) == -1) {
-		printf("4) ERROR\n");
-		return FALSE;
-	}
-}
-
 int login(connection_t connection, char * user) {
-	tpl_node * node;
-	void * buffer;
-	int size, ret;
+	int ret, value;
 
 	if(connection == NULL) {
-		printf("1) ERROR\n");
-		return FALSE;
+		printf("USER ERROR\n");
+		return ERROR_CONNECTION;
 	}
 
-	opcode(LOGIN);
-	
-	if(tpl_jot(TPL_MEM, &buffer, &size, "s", &user) == -1) {
-		printf("2) ERROR\n");
-		return FALSE;
+	ret = opcode(connection, USER);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_send(connection, &size, sizeof(int)) == -1) {
-		printf("3) ERROR\n");
-		return FALSE;
+	ret = write_s(connection, user);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_send(connection, buffer, size) == -1) {
-		printf("4) ERROR\n");
-		return FALSE;
+	ret = read_i(connection, &value);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_receive(connection, &size, sizeof(int)) == -1) {
-		printf("5) ERROR\n");
-		return FALSE;
-	}
-
-	buffer = malloc(size);
-	if(buffer == NULL) {
-		printf("6) ERROR\n");
-		return FALSE;
-	}
-
-	if(server_receive(connection, buffer, size) == -1) {
-		printf("7) ERROR\n");
-		return FALSE;
-	}
-
-	node = tpl_map("i", &ret);
-	tpl_load(node, TPL_MEM, buffer, size);
-	tpl_unpack(node, 0);
-	tpl_free(node);
-
-	printf("Return: %d\n", ret);
-
-	return ret;
+	return value;
 }
 
 double money(connection_t connection) {
-	tpl_node * node;
-	void * buffer;
-	int size;
-	double ret;
+	int ret;
+	double value;
 
 	if(connection == NULL) {
-		printf("1) ERROR\n");
-		return FALSE;
+		printf("MONEY ERROR\n");
+		return ERROR_CONNECTION;
 	}
 
-	opcode(MONEY);
-
-	if(server_receive(connection, &size, sizeof(int)) == -1) {
-		printf("5) ERROR\n");
-		return FALSE;
+	ret = opcode(connection, MONEY);
+	if(ret < OK) {
+		return ret;
 	}
 
-	buffer = malloc(size);
-	if(buffer == NULL) {
-		printf("6) ERROR\n");
-		return FALSE;
+	ret = read_d(connection, &value);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_receive(connection, buffer, size) == -1) {
-		printf("7) ERROR\n");
-		return FALSE;
-	}
-
-	node = tpl_map("d", &ret);
-	tpl_load(node, TPL_MEM, buffer, size);
-	tpl_unpack(node, 0);
-	tpl_free(node);
-
-	printf("Return: %d\n", ret);
-
-	return ret;
+	return value;
 }
 
-int bet(connection_t connection, char * cucco, double money){
-	tpl_node * node;
-	void * buffer;
-	int size, ret;
+int cucco_add(connection_t connection, char * cucco) {
+	int ret, value;
 
 	if(connection == NULL) {
-		printf("1) ERROR\n");
-		return FALSE;
-	}
-	
-	opcode(BET);
-
-	if(tpl_jot(TPL_MEM, &buffer, &size, "sf", &cucco, &money) == -1) {
-		printf("2) ERROR\n");
-		return FALSE;
+		printf("CUCCO_ADD ERROR\n");
+		return ERROR_CONNECTION;
 	}
 
-	if(server_send(connection, &size, sizeof(int)) == -1) {
-		printf("3) ERROR\n");
-		return FALSE;
+	ret = opcode(connection, CUCCO_ADD);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_send(connection, buffer, size) == -1) {
-		printf("4) ERROR\n");
-		return FALSE;
+	ret = write_s(connection, cucco);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_receive(connection, &size, sizeof(int)) == -1) {
-		printf("5) ERROR\n");
-		return FALSE;
+	ret = read_i(connection, &value);
+	if(ret < OK) {
+		return ret;
 	}
 
-	buffer = malloc(size);
-	if(buffer == NULL) {
-		printf("6) ERROR\n");
-		return FALSE;
-	}
-
-	if(server_receive(connection, buffer, size) == -1) {
-		printf("7) ERROR\n");
-		return FALSE;
-	}
-
-	node = tpl_map("i", &ret);
-	tpl_load(node, TPL_MEM, buffer, size);
-	tpl_unpack(node, 0);
-	tpl_free(node);
-
-	printf("Return: %d\n", ret);
-
-	return ret;
-	
-	
+	return value;
 }
 
-
-
-int cucco_add(connection_t connection, char * name){
-	tpl_node * node;
-	void * buffer;
-	int size, ret;
+int cucco_remove(connection_t connection, char * cucco) {
+	int ret, value;
 
 	if(connection == NULL) {
-		printf("1) ERROR\n");
-		return FALSE;
-	}
-	
-	opcode(CUCCO_ADD);
-
-	if(tpl_jot(TPL_MEM, &buffer, &size, "s", &cucco) == -1) {
-		printf("2) ERROR\n");
-		return FALSE;
+		printf("CUCCO_REMOVE ERROR\n");
+		return ERROR_CONNECTION;
 	}
 
-	if(server_send(connection, &size, sizeof(int)) == -1) {
-		printf("3) ERROR\n");
-		return FALSE;
+	ret = opcode(connection, CUCCO_REMOVE);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_send(connection, buffer, size) == -1) {
-		printf("4) ERROR\n");
-		return FALSE;
+	ret = write_s(connection, cucco);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_receive(connection, &size, sizeof(int)) == -1) {
-		printf("5) ERROR\n");
-		return FALSE;
+	ret = read_i(connection, &value);
+	if(ret < OK) {
+		return ret;
 	}
 
-	buffer = malloc(size);
-	if(buffer == NULL) {
-		printf("6) ERROR\n");
-		return FALSE;
-	}
-
-	if(server_receive(connection, buffer, size) == -1) {
-		printf("7) ERROR\n");
-		return FALSE;
-	}
-
-	node = tpl_map("i", &ret);
-	tpl_load(node, TPL_MEM, buffer, size);
-	tpl_unpack(node, 0);
-	tpl_free(node);
-
-	printf("Return: %d\n", ret);
-
-	return ret;
+	return value;
 }
 
-int cucco_remove(connection_t connection, char * name){
-	tpl_node * node;
-	void * buffer;
-	int size, ret;
+int bet(connection_t connection, char * cucco, double money) {
+	int ret, value;
 
 	if(connection == NULL) {
-		printf("1) ERROR\n");
-		return FALSE;
-	}
-	
-	opcode(CUCCO_REMOVE);
-
-	if(tpl_jot(TPL_MEM, &buffer, &size, "s", &cucco) == -1) {
-		printf("2) ERROR\n");
-		return FALSE;
+		printf("BET ERROR\n");
+		return ERROR_CONNECTION;
 	}
 
-	if(server_send(connection, &size, sizeof(int)) == -1) {
-		printf("3) ERROR\n");
-		return FALSE;
+	ret = opcode(connection, BET);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_send(connection, buffer, size) == -1) {
-		printf("4) ERROR\n");
-		return FALSE;
+	ret = write_sf(connection, cucco, money);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_receive(connection, &size, sizeof(int)) == -1) {
-		printf("5) ERROR\n");
-		return FALSE;
+	ret = read_i(connection, &value);
+	if(ret < OK) {
+		return ret;
 	}
 
-	buffer = malloc(size);
-	if(buffer == NULL) {
-		printf("6) ERROR\n");
-		return FALSE;
-	}
-
-	if(server_receive(connection, buffer, size) == -1) {
-		printf("7) ERROR\n");
-		return FALSE;
-	}
-
-	node = tpl_map("i", &ret);
-	tpl_load(node, TPL_MEM, buffer, size);
-	tpl_unpack(node, 0);
-	tpl_free(node);
-
-	printf("Return: %d\n", ret);
-
-	return ret;
+	return value;
 }
 
-int reset(connection_t connection){
-	tpl_node * node;
-	void * buffer;
-	int size;
-	double ret;
+int reset(connection_t connection) {
+	int ret, value;
 
 	if(connection == NULL) {
-		printf("1) ERROR\n");
-		return FALSE;
+		printf("RESET ERROR\n");
+		return ERROR_CONNECTION;
 	}
 
-	opcode(RESET);
-
-	if(server_receive(connection, &size, sizeof(int)) == -1) {
-		printf("5) ERROR\n");
-		return FALSE;
+	ret = opcode(connection, RESET);
+	if(ret < OK) {
+		return ret;
 	}
 
-	buffer = malloc(size);
-	if(buffer == NULL) {
-		printf("6) ERROR\n");
-		return FALSE;
+	ret = read_i(connection, &value);
+	if(ret < OK) {
+		return ret;
 	}
 
-	if(server_receive(connection, buffer, size) == -1) {
-		printf("7) ERROR\n");
-		return FALSE;
-	}
-
-	node = tpl_map("i", &ret);
-	tpl_load(node, TPL_MEM, buffer, size);
-	tpl_unpack(node, 0);
-	tpl_free(node);
-
-	printf("Return: %d\n", ret);
-
-	return ret;
+	return value;
 }
 
+int logout(connection_t connection) {
+	int ret, value;
+
+	if(connection == NULL) {
+		printf("EXIT ERROR\n");
+		return ERROR_CONNECTION;
+	}
+
+	ret = opcode(connection, EXIT);
+	if(ret < OK) {
+		return ret;
+	}
+
+	ret = read_i(connection, &value);
+	if(ret < OK) {
+		return ret;
+	}
+
+	return value;
+}
+
+static int opcode(connection_t connection, opcode_t op) {
+	return write_i(connection, op);
+}

@@ -3,12 +3,14 @@
 
 #include <comapi.h>
 
-int login(connection_t connection);
-int add_cucco(connection_t connection);
-int remove_cucco(connection_t* connection);
-int bet(connection_t* connection);
-int reset(connection_t* connection);
-int money(connection_t* connection);
+int opcode(connection_t connection);
 
+int login(connection_t connection);
+int money(connection_t connection);
+int cucco_add(connection_t connection);
+int cucco_remove(connection_t connection);
+int bet(connection_t connection);
+int reset(connection_t connection);
+int logout(connection_t connection);
 
 #endif

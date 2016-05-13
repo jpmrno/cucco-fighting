@@ -196,11 +196,13 @@ int bet(connection_t* connection){
 	tpl_free(node);
 
 	if(server_receive(connection, &bet, sizeof(float)) == -1){
-		
+		printf("4.1) ERROR\n");
+		return FALSE;
 	}
 
 
 	printf("Cucco: %s\n", user);
+	printf("Bet: %f\n", bet);
 
 	if(tpl_jot(TPL_MEM, &buffer, &size, "i", &ret) == -1) {
 		printf("5) ERROR\n");

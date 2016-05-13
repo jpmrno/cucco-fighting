@@ -83,8 +83,12 @@ int main(int argc, char const * argv[]) {
 }
 
 static int handle(connection_t connection) {
-	int op = opcode(connection);
-	run(connection, op);
+	int op;
+
+	while(TRUE) {
+		op = opcode(connection);
+		run(connection, op);
+	}
 
 	return TRUE;
 }
@@ -149,6 +153,7 @@ static int run(connection_t connection, int op) {
 				printf("Error en el exit...\n");
 				return FALSE;
 			}
+			exit(0);
 		} break;
 	}
 

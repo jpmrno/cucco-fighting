@@ -160,7 +160,7 @@ int reset(connection_t connection) {
 		return ERROR_CONNECTION;
 	}
 
-	printf("(RESET)");
+	printf("(RESET)\n");
 
 	// TODO:
 	value = 21;
@@ -181,7 +181,7 @@ int logout(connection_t connection) {
 		return ERROR_CONNECTION;
 	}
 
-	printf("(EXIT)");
+	printf("(EXIT)\n");
 
 	// TODO:
 	value = 54;

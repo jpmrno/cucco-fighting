@@ -39,9 +39,21 @@ int main(int argc, char const * argv[]) {
 
 	signal(SIGINT, handle_int);
 
-	ret = money(connection);
+	ret = login(connection, "JUAN BARTOLOME NAVAS");
 	if(!ret) {
 		fprintf(stderr, "No se pudo loguear al servidor.\n");
+		server_disconnect(connection);
+	}
+
+	ret = money(connection);
+	if(!ret) {
+		fprintf(stderr, "No se pudo moneiar al servidor.\n");
+		server_disconnect(connection);
+	}
+
+	ret = logout(connection);
+	if(!ret) {
+		fprintf(stderr, "No se pudo logoutear al servidor.\n");
 		server_disconnect(connection);
 	}
 

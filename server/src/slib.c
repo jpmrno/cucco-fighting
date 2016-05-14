@@ -134,7 +134,7 @@ int list(connection_t connection) {
 
 	// TODO:
 	char * cuccos[5] = {"Cucco 1", "Cucco 2", "Cucco 3", "Cucco 4", "Cucco 5"};
-	int length = 3;
+	int length = 5;
 
 	return write_sa(connection, cuccos, length);
 }

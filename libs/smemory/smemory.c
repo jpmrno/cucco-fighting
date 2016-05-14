@@ -14,18 +14,26 @@ typedef struct {
 	int id;
 	void * addr_data;
 	void * addr_size;
+	int sem;
 } __attribute__((packed)) shm_t;
 
+#define SEM_SIZE 2
 enum {
-	SEM_SERVER,
+	SEM_SERVER = 0,
 	SEM_CLIENT
 };
 
 smemory_t smemory_make() {
 	shm_t * shm;
+	short vals[2] = {0, 0}; // Values for initialising the semaphores.
 
 	shm = malloc(sizeof(shm_t));
 	if(shm == NULL) {
+		return NULL;
+	}
+
+	shm->sem = sem_make(SEM_SIZE, vals);
+	if(shm->sem == -1) {
 		return NULL;
 	}
 

@@ -208,17 +208,34 @@ void place_bet(){
 	bzero(cucco, 30);
 	fgets(cucco, 29, stdin);
 	printf("\n%s\n", cucco);
+	
+	int aux = 1;
+	char buff[30];
 	printf("Enter the amount of money you would like to bet.\n");
-	float bett;
-	int scan = scanf("%f", &bett);
-	printf("%f", bett);
-	if(scan < 1){
-		printf("Cualquiera wacho\n");
-		return;
-		
+	while(aux == 1){
+		int flag = 0;
+		int point = 0;
+		fgets(buff, 29,stdin);	
+		int i;
+		int length = strlen(buff);
+		for(i=0; i<length; i++){
+			if((buff[i] < '0' || buff[i] > '9') && buff[i]!='.' && buff[i]!='\n'){
+				flag = 1;
+			}if(buff[i] == '.'){
+				if(point == 1){
+					flag = 1;
+				}
+				point++;
+			}
+		}
+		if(flag == 0){
+			aux = 0;
+		}else{
+			printf("Please enter a valid bet\n");
+		}
 	}
 	
-	
+	float bett= atof(buff);
 	int ret = bet(connection, cucco, bett);
 	if(!ret) {
 		fprintf(stderr, "No se pudo bettear al servidor.\n");

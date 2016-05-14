@@ -235,7 +235,7 @@ static config_t * config_new(const char * file) {
 	}
 
 	port = (int) ini_getl("network", "port", PORT_DEFAULT, file);
-	if(ret <= 0) { // TODO: Validar nuero de puerto?
+	if(ret <= 0) { // TODO: Validar numero de puerto?
 		free(ip);
 		return NULL;
 	}

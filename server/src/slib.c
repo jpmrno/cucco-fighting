@@ -38,7 +38,7 @@ int login(connection_t connection) {
 	printf("(USER) -> %s\n", user);
 
 	// TODO:
-	value = 75;
+	value = 0;
 
 	ret = write_i(connection, value);
 	if(ret < OK) {

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <strings.h>
+#include <string.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 

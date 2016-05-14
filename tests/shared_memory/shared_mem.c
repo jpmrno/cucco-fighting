@@ -105,6 +105,7 @@ void DeleteSemaphoreSet(int id)
         exit(EXIT_FAILURE);
     }
 }
+
 /**
  * Locks a semaphore within a semaphore set.
  *
@@ -117,11 +118,11 @@ void LockSemaphore(int id, int i)
 {
     struct sembuf sb;
     sb.sem_num = i;
-5 THE OBLIGATORY CRAPPY EXAMPLE: A CHAT SYSTEM 7
-sb.sem_op = -1;
-sb.sem_flg = SEM_UNDO;
-semop(id, &sb, 1);
+	sb.sem_op = -1;
+	sb.sem_flg = SEM_UNDO;
+	semop(id, &sb, 1);
 }
+
 /**
  * Unlocks a semaphore within a semaphore set.
  *

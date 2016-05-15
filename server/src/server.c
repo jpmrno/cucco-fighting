@@ -5,9 +5,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <time.h> // TODO: Remove
 #include <signal.h>
 #include <library.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 

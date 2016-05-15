@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <strings.h>
+#include <string.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 
@@ -247,8 +248,8 @@ void exit_cli(){
 	int ret = logout(connection);
 	if(!ret) {
 		fprintf(stderr, "No se pudo logoutear al servidor.\n");
-		server_disconnect(connection);
 	}
+	server_disconnect(connection);
 }
 
 static void handle_int(int sign) {

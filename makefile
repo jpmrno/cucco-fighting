@@ -19,7 +19,7 @@ help:
 
 all: clean build
 
-build: libs server client database logger
+build: libs server client
 
 libs:
 	$(MAKE) -C $@ all

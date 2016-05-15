@@ -43,7 +43,9 @@ database_t database_open(const char * path) {
 void database_close(database_t database) {
 	dbsql_t * db = (dbsql_t *) database;
 
-	sqlite3_close(db);
+	if(db != NULL) {
+		sqlite3_close(db);
+	}
 }
 
 int database_cuccos_add(database_t database, char * name) {

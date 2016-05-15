@@ -1,7 +1,7 @@
 #include <logger.h>
 #include <define.h>
-#include <mqueue.h>
 #include <stdio.h>
+#include <mqueue.h>
 #include <strings.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -10,7 +10,13 @@
 
 static void handle_int(int sign);
 
+static int handle_stdout();
+static int handle_file(const char * path);
+
+static char * level(level_t level);
+
 static mqueue_t mqueue;
+static FILE * fp = NULL;
 
 int main(int argc, char const * argv[]) {
 	const char * file_path;
@@ -40,10 +46,8 @@ int main(int argc, char const * argv[]) {
 
 	if(file_path == NULL) {
 		printf("STDOUT\n");
-		// ret = logger_stdio();
 	} else {
 		printf("FILE: %s\n", file_path);
-		// ret = logger_file(file_path);
 	}
 
 	mqueue = mq_make(1234);
@@ -54,8 +58,12 @@ int main(int argc, char const * argv[]) {
 
 	signal(SIGINT, handle_int);
 
-	while(TRUE) {
-
+	if(file_path == NULL){
+		handle_stdout();
+	}else{
+		if(handle_file(file_path)) {
+			printf("No pude abrir el archivo guey!\n");
+		}
 	}
 
 	mq_remove(mqueue);
@@ -63,22 +71,54 @@ int main(int argc, char const * argv[]) {
 	return 0;
 }
 
-// int logger_stdio() {
-
-// }
-
-// int logger_file(char * path) {
-// 	FILE * file;
-
-// 	file = fopen(path, "a+");
-// 	if(file == NULL) {
-// 		return FALSE;
-// 	}
-// }
-
 static void handle_int(int sign) {
 	if(sign == SIGINT) {
+		fclose(fp);
 		mq_remove(mqueue);
 		exit(EXIT_FAILURE);
 	}
+}
+
+static int handle_stdout() {
+	qmessage_t* msg = malloc(sizeof(qmessage_t));
+	if(msg == NULL){
+		exit(EXIT_FAILURE);
+	}
+	while(TRUE){
+		mq_receive(mqueue, 0, msg);
+		printf("%s %s\n", level(msg->level), msg->text);
+	}
+}
+
+static int handle_file(const char * path) {
+
+	qmessage_t* msg = malloc(sizeof(qmessage_t));
+	if(msg == NULL){
+		exit(EXIT_FAILURE);
+	}
+	fp = fopen(path, "wb");
+	if(fp == NULL){
+		return FALSE;
+	}
+	while(TRUE){
+		mq_receive(mqueue, 0, msg);
+		fprintf(fp, "%s %s\n", level(msg->level), msg->text);
+	}
+	fclose(fp);
+	return TRUE;
+}
+
+static char * level(level_t level) {
+	switch(level) {
+		case LEVEL_INFO:
+			return "Info:";
+			break;
+		case LEVEL_WARNING:
+			return "Warning";
+			break;
+		case LEVEL_ERROR:
+			return "Error: ";
+			break;
+	}
+	return "";
 }

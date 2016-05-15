@@ -3,12 +3,12 @@ include ../makevars
 # --[ Vars ]------------------ #
 TARGET = server.app
 SRC_C = src
-SRC_HEADERS = ../$(LIBS_HEADERS) include ../comapi
+SRC_HEADERS = ../$(LIBS_HEADERS) include ../comapi ../comapi/db_sv
 SRC_LIBS = ../$(LIBS_PATH)
-SRC_API = ../comapi
-SRC_IMPL = $(SRC_API)/impl
-LIBS = random ini serial
-GCC_FLAGS += -DSERVER
+SRC_API = ../comapi ../comapi/db_sv
+SRC_IMPL = ../comapi/impl
+LIBS = random ini serial semaphores mqueue
+GCC_FLAGS += -DSERVER -DDS_CLIENT
 # ---------------------------- #
 
 # --[ Cond ]------------------ #
@@ -18,7 +18,7 @@ endif
 # ---------------------------- #
 
 SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)
-SOURCES += $(wildcard $(SRC_API)/*.c)
+SOURCES += $(foreach SRC,$(SRC_API),$(wildcard $(SRC)/*.c))
 OBJECTS = $(SOURCES:.c=.o)
 
 SOURCES_IMPL = $(SRC_IMPL)/$(impl).c

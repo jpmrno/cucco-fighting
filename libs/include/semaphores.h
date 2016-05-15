@@ -1,6 +1,8 @@
 #ifndef _SEMAPHORES_H_
 #define _SEMAPHORES_H_
 
+#include <sys/types.h>
+
 /**
  * Creates a new semaphore set.
  *
@@ -8,7 +10,9 @@
  * @param  vals  Default values to start off with.
  * @return Id of semaphore set.
  */
-int sem_make(int n, short * vals);
+int sem_make(key_t key, int n, short * vals);
+
+int sem_open(key_t key);
 
 /**
  * Frees up the given semaphore set.

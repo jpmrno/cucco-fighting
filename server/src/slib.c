@@ -1,15 +1,15 @@
 #include <slib.h>
 #include <define.h>
 #include <library.h>
+#include <assert.h>
+#include <string.h>
+#include <strings.h>
 #include <stdio.h> // TODO: Remove
 
 int opcode(connection_t connection) { // TODO: Change to opcode_t
 	int ret, value;
 
-	if(connection == NULL) {
-		printf("OPCODE ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	ret = read_i(connection, &value);
 	if(ret < OK) {
@@ -21,67 +21,49 @@ int opcode(connection_t connection) { // TODO: Change to opcode_t
 	return value;
 }
 
-int login(connection_t connection) {
-	char * user;
-	int ret, value;
+// int login(connection_t connection) {
+// 	char * user;
+// 	int ret, value;
 
-	if(connection == NULL) {
-		printf("USER ERROR\n");
-		return ERROR_CONNECTION;
-	}
+// 	if(connection == NULL) {
+// 		printf("USER ERROR\n");
+// 		return ERROR_CONNECTION;
+// 	}
 
-	ret = read_s(connection, &user);
-	if(ret < OK) {
-		return ret;
-	}
+// 	ret = read_s(connection, &user);
+// 	if(ret < OK) {
+// 		return ret;
+// 	}
 
-	printf("(USER) -> %s\n", user);
+// 	printf("(USER) -> %s\n", user);
 
-	// TODO:
-	value = 75;
+// 	// TODO:
+// 	value = 75;
 
-	ret = write_i(connection, value);
-	if(ret < OK) {
-		return ret;
-	}
+// 	ret = write_i(connection, value);
+// 	if(ret < OK) {
+// 		return ret;
+// 	}
 
-	return value;
-}
+// 	return value;
+// }
 
-int money(connection_t connection) {
-	int ret;
-	double value;
-
-	if(connection == NULL) {
-		printf("MONEY ERROR\n");
-		return ERROR_CONNECTION;
-	}
+int money(connection_t connection, double money) {
+	assert(connection != NULL);
 
 	printf("(MONEY)\n");
 
-	// TODO:
-	value = 12;
-
-	ret = write_d(connection, value);
-	if(ret < OK) {
-		return ret;
-	}
-
-	return value;
+	return !(write_d(connection, money) < OK);
 }
 
 int cucco_add(connection_t connection) {
 	char * cucco;
-	int ret, value;
+	int value;
 
-	if(connection == NULL) {
-		printf("CUCCO_ADD ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
-	ret = read_s(connection, &cucco);
-	if(ret < OK) {
-		return ret;
+	if(read_s(connection, &cucco) < OK) {
+		return FALSE;
 	}
 
 	printf("(ADD) -> %s\n", cucco);
@@ -89,26 +71,17 @@ int cucco_add(connection_t connection) {
 	// TODO:
 	value = 95;
 
-	ret = write_i(connection, value);
-	if(ret < OK) {
-		return ret;
-	}
-
-	return value;
+	return !(write_i(connection, value) < OK);
 }
 
 int cucco_remove(connection_t connection) {
 	char * cucco;
-	int ret, value;
+	int value;
 
-	if(connection == NULL) {
-		printf("CUCCO_REMOVE ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
-	ret = read_s(connection, &cucco);
-	if(ret < OK) {
-		return ret;
+	if(read_s(connection, &cucco) < OK) {
+		return FALSE;
 	}
 
 	printf("(REMOVE) -> %s\n", cucco);
@@ -116,19 +89,11 @@ int cucco_remove(connection_t connection) {
 	// TODO:
 	value = 95;
 
-	ret = write_i(connection, value);
-	if(ret < OK) {
-		return ret;
-	}
-
-	return value;
+	return !(write_i(connection, value) < OK);
 }
 
 int list(connection_t connection) {
-	if(connection == NULL) {
-		printf("LIST ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	printf("(LIST)\n");
 
@@ -136,75 +101,76 @@ int list(connection_t connection) {
 	char * cuccos[5] = {"Cucco 1", "Cucco 2", "Cucco 3", "Cucco 4", "Cucco 5"};
 	int length = 5;
 
-	return write_sa(connection, cuccos, length);
+	return !(write_sa(connection, cuccos, length) < OK);
 }
 
-int bet(connection_t connection) {
+int bet(connection_t connection, double * wallet, int * clients, int * bettors, char ** winner) {
 	char * cucco;
 	double money;
-	int ret, value;
+	double value;
 
-	if(connection == NULL) {
-		printf("BET ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
-	ret = read_sf(connection, &cucco, &money);
-	if(ret < OK) {
-		return ret;
+	if(read_sf(connection, &cucco, &money) < OK) {
+		return FALSE;
 	}
 
 	printf("(BET) -> %f to %s\n", money, cucco);
 
+	if(money < 0) {
+		value = 0;
+	} else {
+		if(money > *wallet) {
+			money = *wallet;
+		}
+
+		if(*bettors == 0) {
+			*winner = NULL;
+		}
+
+		(*bettors)++;
+		if(*bettors == *clients) {
+			printf("FIGHT INIT: %d/%d\n", *bettors, *clients);
+			*winner = "asd";
+			// TODO: figth();
+		}
+		printf("BETTORS: %d\n", *bettors);
+		while(*winner == NULL);
+
+		if(!strcmp(cucco, *winner)) {
+			(*wallet) += money;
+		} else {
+			(*wallet) -= money;
+		}
+		(*bettors)--;
+	}
+
 	// TODO:
 	value = 65;
 
-	ret = write_i(connection, value);
-	if(ret < OK) {
-		return ret;
-	}
-
-	return value;
+	return !(write_i(connection, value) < OK);
 }
 
 int reset(connection_t connection) {
-	int ret, value;
+	int value;
 
-	if(connection == NULL) {
-		printf("RESET ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	printf("(RESET)\n");
 
-	// TODO:
-	value = 21;
+	value = TRUE;
 
-	ret = write_i(connection, value);
-	if(ret < OK) {
-		return ret;
-	}
-
-	return value;
+	return !(write_i(connection, value) < OK);
 }
 
 int logout(connection_t connection) {
-	int ret, value;
+	int value;
 
-	if(connection == NULL) {
-		printf("EXIT ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	printf("(EXIT)\n");
 
-	// TODO:
-	value = 54;
+	value = TRUE;
 
-	ret = write_i(connection, value);
-	if(ret < OK) {
-		return ret;
-	}
-
-	return value;
+	return !(write_i(connection, value) < OK);
 }

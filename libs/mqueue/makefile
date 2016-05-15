@@ -1,7 +1,7 @@
 include ../../makevars
 
 # --[ Vars ]------------------ #
-NAME = smemory
+NAME = mqueue
 SRC_C = .
 SRC_HEADERS = ../include
 # ---------------------------- #

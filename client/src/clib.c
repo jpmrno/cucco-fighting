@@ -1,7 +1,7 @@
 #include <clib.h>
 #include <define.h>
 #include <library.h>
-#include <stdio.h> // TODO: Remove
+#include <assert.h>
 
 static int opcode(connection_t connection, opcode_t op);
 
@@ -25,40 +25,34 @@ static int opcode(connection_t connection, opcode_t op);
 // 	server_disconnect(connection);
 // }
 
-int login(connection_t connection, char * user) {
-	int ret, value;
+// int login(connection_t connection, char * user) {
+// 	int ret, value;
 
-	if(connection == NULL) {
-		printf("USER ERROR\n");
-		return ERROR_CONNECTION;
-	}
+// 	assert(connection != NULL);
 
-	ret = opcode(connection, USER);
-	if(ret < OK) {
-		return ret;
-	}
+// 	ret = opcode(connection, USER);
+// 	if(ret < OK) {
+// 		return ret;
+// 	}
 
-	ret = write_s(connection, user);
-	if(ret < OK) {
-		return ret;
-	}
+// 	ret = write_s(connection, user);
+// 	if(ret < OK) {
+// 		return ret;
+// 	}
 
-	ret = read_i(connection, &value);
-	if(ret < OK) {
-		return ret;
-	}
+// 	ret = read_i(connection, &value);
+// 	if(ret < OK) {
+// 		return ret;
+// 	}
 
-	return value;
-}
+// 	return value;
+// }
 
 double money(connection_t connection) {
 	int ret;
 	double value;
 
-	if(connection == NULL) {
-		printf("MONEY ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	ret = opcode(connection, MONEY);
 	if(ret < OK) {
@@ -76,10 +70,7 @@ double money(connection_t connection) {
 int cucco_add(connection_t connection, char * cucco) {
 	int ret, value;
 
-	if(connection == NULL) {
-		printf("CUCCO_ADD ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	ret = opcode(connection, CUCCO_ADD);
 	if(ret < OK) {
@@ -102,10 +93,7 @@ int cucco_add(connection_t connection, char * cucco) {
 int cucco_remove(connection_t connection, char * cucco) {
 	int ret, value;
 
-	if(connection == NULL) {
-		printf("CUCCO_REMOVE ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	ret = opcode(connection, CUCCO_REMOVE);
 	if(ret < OK) {
@@ -128,10 +116,7 @@ int cucco_remove(connection_t connection, char * cucco) {
 int list(connection_t connection, char *** list, int * length) {
 	int ret;
 
-	if(connection == NULL) {
-		printf("LIST ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	ret = opcode(connection, LIST);
 	if(ret < OK) {
@@ -144,10 +129,7 @@ int list(connection_t connection, char *** list, int * length) {
 int bet(connection_t connection, char * cucco, double money) {
 	int ret, value;
 
-	if(connection == NULL) {
-		printf("BET ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	ret = opcode(connection, BET);
 	if(ret < OK) {
@@ -170,10 +152,7 @@ int bet(connection_t connection, char * cucco, double money) {
 int reset(connection_t connection) {
 	int ret, value;
 
-	if(connection == NULL) {
-		printf("RESET ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	ret = opcode(connection, RESET);
 	if(ret < OK) {
@@ -191,10 +170,7 @@ int reset(connection_t connection) {
 int logout(connection_t connection) {
 	int ret, value;
 
-	if(connection == NULL) {
-		printf("EXIT ERROR\n");
-		return ERROR_CONNECTION;
-	}
+	assert(connection != NULL);
 
 	ret = opcode(connection, EXIT);
 	if(ret < OK) {

@@ -8,8 +8,14 @@
 #define TRUE !FALSE
 #define FALSE 0
 
-#define SUCCESS 0
+#define OK 0
 #define ERROR -1
-#define ERROR_OCCURRED(x) ((x) < SUCCESS)
+#define ERROR_OCCURRED(x) ((x) < OK)
+
+typedef enum {
+	LEVEL_INFO = 0,
+	LEVEL_WARNING,
+	LEVEL_ERROR
+} level_t;
 
 #endif

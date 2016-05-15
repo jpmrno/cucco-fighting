@@ -12,14 +12,14 @@
  * @param  vals  Default values to start off with.
  * @return Id of semaphore set.
  */
-int sem_make(int n, short * vals) {
+int sem_make(key_t key, int n, short * vals) {
 	union semun arg;
 	int id;
 
 	assert(n > 0);
 	assert(vals != NULL);
 
-	id = semget(IPC_PRIVATE, n, IPC_CREAT | IPC_EXCL | 0666); // TODO: Test permissions
+	id = semget(key, n, IPC_CREAT | IPC_EXCL | SEM_R | SEM_A);
 	arg.array = vals;
 	if(semctl(id, 0, SETALL, arg) == -1) {
 		sem_remove(id);
@@ -27,6 +27,10 @@ int sem_make(int n, short * vals) {
 	}
 
 	return id;
+}
+
+int sem_open(key_t key) {
+	semget(key, 0, SEM_R | SEM_A);
 }
 
 /**
@@ -57,7 +61,7 @@ int sem_lock(int id, int i) {
 	sb.sem_op = -1;
 	sb.sem_flg = SEM_UNDO;
 
-	return semop(id, &sb, 1) == 0 ? TRUE : FALSE;
+	return !semop(id, &sb, 1);
 }
 
 /**
@@ -73,5 +77,5 @@ int sem_unlock(int id, int i) {
 	sb.sem_op = 1;
 	sb.sem_flg = SEM_UNDO;
 
-	return semop(id, &sb, 1) == 0 ? TRUE : FALSE;
+	return !semop(id, &sb, 1);
 }

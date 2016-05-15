@@ -4,6 +4,7 @@
 #include <sys/msg.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <stdio.h>
 
 #define PERMISSIONS 0666
 #define FLAGS_MAKE IPC_CREAT | IPC_EXCL
@@ -109,3 +110,5 @@ static mq_t * mq_new(int owner, key_t key, int id) {
 static void mq_free(mq_t * mqueue) {
 	free(mqueue);
 }
+
+

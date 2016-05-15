@@ -55,7 +55,13 @@ int main(int argc, char const * argv[]) {
 	signal(SIGINT, handle_int);
 
 	while(TRUE) {
-
+		char *message;
+		//mq_receive(mqueue, long type, message_t * message);
+		if(file_path == NULL){
+			//se va a imprimir
+		}else{
+			//se guarda en el archivo
+		}
 	}
 
 	mq_remove(mqueue);
@@ -80,5 +86,34 @@ static void handle_int(int sign) {
 	if(sign == SIGINT) {
 		mq_remove(mqueue);
 		exit(EXIT_FAILURE);
+	}
+}
+
+static FILE* int open_file(char* path){
+	FILE* fp;
+	fp = fopen(path, "w+");
+	if(fp == NULL){
+		return NULL;
+	}
+	return fp;
+}
+
+static int close_file(fp){
+	int ret = fclose(fp);
+	if(ret != 0){
+		return -1;
+	}
+	return 1;
+}
+
+static int write_file(FILE* fp, int priority, char* msg){
+	int ret;
+	ret = fwrite(priority, sizeof(int), 1, fp);
+	if(ret != 0){
+		return -1;
+	}
+	ret = fwrite(msg, strlen(msg), 1, fp);
+	if(ret != 0){
+		return -1;
 	}
 }

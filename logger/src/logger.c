@@ -9,8 +9,11 @@
 #define USAGE_STRING "Usage: 'logger.app <stdout/file> [file_path]'.\n"
 
 static void handle_int(int sign);
+static int handle_file(char * file_path);
+static int write_file(FILE* fp, int priority, char* msg);
 
 static mqueue_t mqueue;
+static FILE* fp = NULL;
 
 int main(int argc, char const * argv[]) {
 	const char * file_path;
@@ -54,56 +57,46 @@ int main(int argc, char const * argv[]) {
 
 	signal(SIGINT, handle_int);
 
-	while(TRUE) {
-		char *message;
-		//mq_receive(mqueue, long type, message_t * message);
-		if(file_path == NULL){
-			//se va a imprimir
-		}else{
-			//se guarda en el archivo
-		}
+	message_t* msg = malloc(sizeof(message_t));
+	if(msg == NULL){
+		exit(EXIT_FAILURE);
 	}
+	
+	if(file_path == NULL){
+		while(TRUE){
+			mq_receive(mqueue, 0 ,msg);
+			printf("Type %d: %s\n", msg->type, msg->message);
+		}
+	}else{
+		handle_file(file_path);
+	}	
 
 	mq_remove(mqueue);
 
 	return 0;
 }
 
-// int logger_stdio() {
-
-// }
-
-// int logger_file(char * path) {
-// 	FILE * file;
-
-// 	file = fopen(path, "a+");
-// 	if(file == NULL) {
-// 		return FALSE;
-// 	}
-// }
 
 static void handle_int(int sign) {
 	if(sign == SIGINT) {
+		fclose(fp);
 		mq_remove(mqueue);
 		exit(EXIT_FAILURE);
 	}
 }
 
-static FILE* int open_file(char* path){
-	FILE* fp;
+static int handle_file(char * path) {
 	fp = fopen(path, "w+");
 	if(fp == NULL){
-		return NULL;
+		return FALSE;
 	}
-	return fp;
-}
 
-static int close_file(fp){
-	int ret = fclose(fp);
-	if(ret != 0){
-		return -1;
+	while(TRUE){
+		mq_receive(mqueue, 0, msg);
+		write_file(fp, msg->type, msg->message);
 	}
-	return 1;
+
+	fclose(fp);
 }
 
 static int write_file(FILE* fp, int priority, char* msg){

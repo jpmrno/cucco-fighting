@@ -7,7 +7,7 @@ SRC_HEADERS = ../$(LIBS_HEADERS) include ../comapi
 SRC_LIBS = ../$(LIBS_PATH)
 SRC_API = ../comapi
 SRC_IMPL = $(SRC_API)/impl
-LIBS = random ini serial
+LIBS = random ini serial mqueue
 GCC_FLAGS += -DSERVER
 # ---------------------------- #
 

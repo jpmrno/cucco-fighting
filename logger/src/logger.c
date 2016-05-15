@@ -1,19 +1,16 @@
 #include <logger.h>
 #include <define.h>
 #include <mqueue.h>
-#include <stdio.h>
 #include <strings.h>
 #include <stdlib.h>
 #include <signal.h>
 
 #define USAGE_STRING "Usage: 'logger.app <stdout/file> [file_path]'.\n"
 
-static void handle_int(int sign);
-static int handle_file(char * file_path);
-static int write_file(FILE* fp, int priority, char* msg);
+static char * level(level_t level);
 
 static mqueue_t mqueue;
-static FILE* fp = NULL;
+static FILE * fp = NULL;
 
 int main(int argc, char const * argv[]) {
 	const char * file_path;
@@ -43,10 +40,8 @@ int main(int argc, char const * argv[]) {
 
 	if(file_path == NULL) {
 		printf("STDOUT\n");
-		// ret = logger_stdio();
 	} else {
 		printf("FILE: %s\n", file_path);
-		// ret = logger_file(file_path);
 	}
 
 	mqueue = mq_make(1234);
@@ -56,19 +51,13 @@ int main(int argc, char const * argv[]) {
 	}
 
 	signal(SIGINT, handle_int);
-
-	message_t* msg = malloc(sizeof(message_t));
-	if(msg == NULL){
-		exit(EXIT_FAILURE);
-	}
 	
 	if(file_path == NULL){
-		while(TRUE){
-			mq_receive(mqueue, 0 ,msg);
-			printf("Type %d: %s\n", msg->type, msg->message);
-		}
+		handle_stdout();
 	}else{
-		handle_file(file_path);
+		if(handle_file(file_path)) {
+			printf("No pude abrir el archivo guey!\n");
+		}
 	}	
 
 	mq_remove(mqueue);
@@ -85,28 +74,47 @@ static void handle_int(int sign) {
 	}
 }
 
-static int handle_file(char * path) {
-	fp = fopen(path, "w+");
+static int handle_stdout(){
+	qmessage_t* msg = malloc(sizeof(qmessage_t));
+	if(msg == NULL){
+		exit(EXIT_FAILURE);
+	}
+	while(TRUE){
+		mq_receive(mqueue, 0, msg);
+		printf("%s %s\n", level(msg->level), msg->text);
+	}
+}
+
+static int handle_file(const char * path) {
+
+	qmessage_t* msg = malloc(sizeof(qmessage_t));
+	if(msg == NULL){
+		exit(EXIT_FAILURE);
+	}
+	fp = fopen(path, "wb");
 	if(fp == NULL){
 		return FALSE;
 	}
-
 	while(TRUE){
 		mq_receive(mqueue, 0, msg);
-		write_file(fp, msg->type, msg->message);
+		fprintf(fp, "%s %s\n", level(msg->level), msg->text);
 	}
-
 	fclose(fp);
+	return TRUE;
 }
 
-static int write_file(FILE* fp, int priority, char* msg){
-	int ret;
-	ret = fwrite(priority, sizeof(int), 1, fp);
-	if(ret != 0){
-		return -1;
+static char * level(level_t level) {
+	switch(level) {
+		case LEVEL_INFO:
+			return "Info:";
+			break;
+		case LEVEL_WARNING:
+			return "Warning";
+			break;
+		case LEVEL_ERROR:
+			return "Error: ";
+			break;
 	}
-	ret = fwrite(msg, strlen(msg), 1, fp);
-	if(ret != 0){
-		return -1;
-	}
+	return "";
 }
+

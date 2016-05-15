@@ -9,7 +9,11 @@
 #include <library.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <mqueue.h>
+#include <string.h>
+#include <log.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 
@@ -37,31 +41,35 @@ int main(int argc, char const * argv[]) {
 			exit(EXIT_FAILURE);
 		}
 	}
+	
+	log_open();
 
 	connection = server_open(config_file);
 	if(connection == NULL) {
-		printf("Error en la conexion!\n");
+		log_send(LEVEL_ERROR, "Error in the connection");
 		exit(EXIT_FAILURE);
 	}
 
 	signal(SIGINT, handle_int);
 	signal(SIGCHLD, handle_int);
-
+	
+	log_send(LEVEL_INFO, "HOLA");
+	
 	while(TRUE) {
 		connection_t connection_accepted;
 		int ret, pid;
 
 		connection_accepted = server_accept(connection);
 		if(connection_accepted == NULL) {
-			printf("Error en la nueva conexion!\n");
+			log_send(LEVEL_ERROR, "Error in the new connection");
 			exit(EXIT_FAILURE);
 		}
-
+		log_send(LEVEL_INFO, "A new connection has been added");
 		connection_numer++;
 
 		pid = fork();
 		if(pid == -1) {
-			printf("Error en el fork!\n");
+			log_send(LEVEL_ERROR, "Error with the fork");
 			exit(EXIT_FAILURE);
 		}
 
@@ -74,11 +82,12 @@ int main(int argc, char const * argv[]) {
 			exit(ret);
 		}
 
-		printf("(%d) Desconectando nueva conexion...\n", connection_numer);
+		log_send(LEVEL_INFO, "Disconnecting new connection");
 		server_ajar(connection_accepted);
 	}
 
-	printf("Desconectando principal conexion...\n");
+	log_send(LEVEL_INFO, "Disconnecting the main connection");
+	log_close();
 	server_close(connection);
 
 	return 0;
@@ -110,56 +119,70 @@ static int run(connection_t connection, int op) {
 	switch(op) {
 		case USER: {
 			if(!login(connection)) {
-				printf("Error en el login...\n");
+				log_send(LEVEL_WARNING, "Error with the login");
 				return FALSE;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully logged in");
 			}
 		} break;
 
 		case MONEY: {
 			if(!money(connection)) {
-				printf("Error en el money...\n");
+				log_send(LEVEL_WARNING, "Error getting the users current amount of money");
 				return FALSE;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully getting the money");
 			}
 		} break;
 
 		case CUCCO_ADD: {
 			if(!cucco_add(connection)) {
-				printf("Error en el add...\n");
+				log_send(LEVEL_WARNING, "Error adding the cucco");
 				return FALSE;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully adding the cucco");
 			}
 		} break;
 
 		case CUCCO_REMOVE: {
 			if(!cucco_remove(connection)) {
-				printf("Error en el remove...\n");
+				log_send(LEVEL_WARNING, "Error removing the cucco");
 				return FALSE;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully removed the cucco");
 			}
 		} break;
 
 		case LIST: {
 			if(list(connection)) {
-				printf("Error en el list...\n");
+				log_send(LEVEL_WARNING, "Error listing the cuccos");
 				return FALSE;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully got the cucco list");
 			}
 		} break;
 
 		case BET: {
 			if(!bet(connection)) {
-				printf("Error en el bet...\n");
+				log_send(LEVEL_WARNING, "Error with the bet");
 				return FALSE;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully placed a bet");
 			}
 		} break;
 
 		case RESET: {
 			if(!reset(connection)) {
-				printf("Error en el reset...\n");
+				log_send(LEVEL_WARNING, "Error reseting the users amount of money");
 				return FALSE;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully reset the users amount of money");
 			}
 		} break;
 
 		case EXIT: {
 			if(!logout(connection)) {
-				printf("Error en el exit...\n");
+				log_send(LEVEL_WARNING, "Error exiting");
 				return FALSE;
 			}
 			exit(0);

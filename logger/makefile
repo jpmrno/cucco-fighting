@@ -5,7 +5,7 @@ TARGET = logger.app
 SRC_C = src
 SRC_HEADERS = ../$(LIBS_HEADERS) include
 SRC_LIBS = ../$(LIBS_PATH)
-LIBS =
+LIBS = mqueue
 # ---------------------------- #
 
 SOURCES = $(wildcard $(SRC_C)/*.c & $(SRC_C)/**/*.c)

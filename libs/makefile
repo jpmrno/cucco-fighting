@@ -1,6 +1,6 @@
 include ../makevars
 
-LIBS = ini pipes random serial semaphores smemory
+LIBS = ini pipes random serial mqueue
 
 all:
 	$(foreach LIB, $(LIBS), $(MAKE) -C $(LIB) all;)

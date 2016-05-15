@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <stdio.h>
+#include <assert.h>
 
 #define PERMISSIONS 0666
 #define FLAGS_MAKE IPC_CREAT | IPC_EXCL
@@ -71,21 +72,34 @@ void mq_close(mqueue_t mqueue) {
 	mq_free(mq);
 }
 
-int mq_send(mqueue_t mqueue, message_t * message) {
+int mq_send(mqueue_t mqueue, qmessage_t * message) {
 	mq_t * mq = (mq_t *) mqueue;
-
-	return msgsnd(mq->id, message, sizeof(message_t) - sizeof(long), IPC_NOWAIT);
+	int ret;
+	
+	assert(mq != NULL);
+	assert(message != NULL);
+	assert(message->type > 0);
+	
+	return msgsnd(mq->id, message, sizeof(qmessage_t) - sizeof(long), IPC_NOWAIT);
 }
 
-int mq_receive(mqueue_t mqueue, long type, message_t * message) {
+int mq_receive(mqueue_t mqueue, long type, qmessage_t * message) {
 	mq_t * mq = (mq_t *) mqueue;
+	int ret;
+	
+	assert(mq != NULL);
+	assert(message != NULL);
 
-	return msgrcv(mq->id, message, sizeof(message_t) - sizeof(long), type, 0);
+	ret = msgrcv(mq->id, message, sizeof(qmessage_t) - sizeof(long), type, 0);
+	
+	return ret;
 }
 
 int peek_peek(mqueue_t mqueue, long type) {
 	mq_t * mq = (mq_t *) mqueue;
 	int ret;
+	
+	assert(mq != NULL);
 
 	ret = msgrcv(mq->id, NULL, 0, type, IPC_NOWAIT);
 

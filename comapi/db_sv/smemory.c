@@ -31,7 +31,7 @@ enum {
 
 smemory_t smemory_make(key_t key) {
 	shm_t * shm;
-	short vals[SEM_SIZE] = {0, 0, -1}; // Values for initialising the semaphores
+	short vals[SEM_SIZE] = {0, 0, 1}; // Values for initialising the semaphores
 
 	shm = malloc(sizeof(shm_t));
 	if(shm == NULL) {

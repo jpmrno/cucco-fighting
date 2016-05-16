@@ -44,7 +44,7 @@ int server_sems = -1;
 int main(int argc, char const * argv[]) {
 	const char * config_file;
 	int connection_numer = 0, ret, pid;
-	short vals[SEM_SIZE] = {-1, -1};
+	short vals[SEM_SIZE] = {1, 1};
 	// key_t key;
 
 	switch(argc) {

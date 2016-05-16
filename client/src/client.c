@@ -12,7 +12,7 @@
 
 static void handle_int(int sign);
 static void print_help();
-static void intro();
+static void running_chicken();
 static void menu();
 static void cuccos_list();
 static void money_print();
@@ -22,14 +22,14 @@ static void cuccos_remove();
 static void place_bet();
 static void client_exit();
 static float get_bett();
-static void start();
 static int cucco_exist(char* cucco);
+
+static void fighting_cuccos();
 
 static connection_t connection = NULL;
 
 int main(int argc, char const * argv[]) {
 	const char * config_file;
-	int i = 0;
 
 	switch(argc) {
 		case 1: {
@@ -45,9 +45,7 @@ int main(int argc, char const * argv[]) {
 			exit(EXIT_FAILURE);
 		}
 	}
-	while(i++ < 2) {  
-		intro();
-	}
+	
 	
 	connection = server_connect(config_file);
 	if(connection == NULL) {
@@ -55,9 +53,15 @@ int main(int argc, char const * argv[]) {
 		exit(EXIT_FAILURE);
 	}
 	
+	system("clear");
+	printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
+	printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
+	printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
+	printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
+	printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
+	
 	signal(SIGINT, handle_int);
 	
-	start();
 	menu();
 	return 0;
 }
@@ -96,6 +100,10 @@ static void menu() {
 			system("clear");
 			
 		}else if(strcmp(buffer, "exit\n")== 0){
+			int i= 0;
+			while(i++ < 2) {  
+				running_chicken();
+			}
 			alive = 0;
 			system("clear");
 			client_exit();
@@ -258,6 +266,14 @@ static void place_bet() {
 	}
 
 	bett = get_bett();
+	system("clear");
+	printf("The start will start when all the online clients place their bets...\n");
+	int i = 0;
+	while(i<3){
+		fighting_cuccos();
+		i++;
+	}
+	
 	winner = bet(connection, cucco, bett);
 	if(winner == NULL) {
 		fprintf(stderr, "No se pudo bettear al servidor.\n");
@@ -265,6 +281,17 @@ static void place_bet() {
 	}
 
 	printf("The winner is... %s\n", winner);
+	if(strcmp(winner, cucco) == 0){
+		printf("The cucco you placed a bet on has won!\n");
+		printf("      _\n");
+		printf("     /(|\n");
+		printf("    (  :\n");
+		printf("   __\\  \\  _____\n");
+		printf(" (____)  `|\n");
+		printf("(____)|   |\n");
+		printf(" (____).__|\n");
+		printf("  (___)__.|_____\n");
+	}
 }
 
 //TODO: verificar desde el servidor
@@ -334,7 +361,7 @@ static void handle_int(int sign) {
 	}
 }
 
-static void intro() {
+static void running_chicken() {
 	int i = 0, count = 0;
 
 	while(i < 60) {
@@ -366,23 +393,82 @@ static void intro() {
 		i++;
 	}
 	
-	system("clear");
-	printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
-	printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
-	printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
-	printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
-	printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
+	// system("clear");
+	// printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
+	// printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
+	// printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
+	// printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
+	// printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
 }
 
-static void start(){
-	char c;
-	printf("Press enter to start the program\n");
-	while((c=getchar())!= '\n'){
-		system("clear");
-		printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
-		printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
-		printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
-		printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
-		printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
-	}
+static void fighting_cuccos(){
+	system("clear");
+	printf("   __\t\t  __   \n");
+	printf("  ( ->\t\t <- ) \n");
+	printf(" / )\\\t\t /( \\\n");
+	printf("<_/_/\t\t \\_\\_>\n");
+	printf(" " "\t\t  " "\n");
+	
+	usleep(130000);
+	system("clear");
+	
+	printf("\t   __\t\t\t  __   \n");
+	printf("\t  ( ->\t\t\t <- ) \n");
+	printf("\t / )\\\t\t\t /( \\\n");
+	printf("\t<_/_/\t\t\t \\_\\_>\n");
+	printf("\t " "\t\t\t  " "\n");
+	
+	
+	usleep(130000);
+	system("clear");
+	
+	printf("   __\t  __   \n");
+	printf("  ( ->\t <- ) \n");
+	printf(" / )\\\t /( \\\n");
+	printf("<_/_/\t \\_\\_>\n");
+	printf(" " "\t  " "\n");
+	
+	
+	usleep(130000);
+	system("clear");
+	
+	
+	printf("\t   __\t  __   \n");
+	printf("\t  ( ->\t <- ) \n");
+	printf("\t / )\\\t /( \\\n");
+	printf("\t<_/_/\t \\_\\_>\n");
+	printf("\t " "\t  " "\n");
+	
+	usleep(130000);
+	system("clear");
+	
+	printf("\t\t   __\t  __   \n");
+	printf("\t\t  ( ->\t <- ) \n");
+	printf("\t\t / )\\\t /( \\\n");
+	printf("\t\t<_/_/\t \\_\\_>\n");
+	printf("\t\t " "\t  " "\n");
+	
+	
+	usleep(130000);
+	system("clear");
+	
+	printf("\t   __\t  __   \n");
+	printf("\t  ( ->\t <- ) \n");
+	printf("\t / )\\\t /( \\\n");
+	printf("\t<_/_/\t \\_\\_>\n");
+	printf("\t " "\t  " "\n");
+	
 }
+
+// static void start(){
+// 	char c;
+// 	printf("Press enter to start the program\n");
+// 	while((c=getchar())!= '\n'){
+// 		system("clear");
+// 		printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
+// 		printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
+// 		printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
+// 		printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
+// 		printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
+// 	}
+// }

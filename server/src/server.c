@@ -70,19 +70,19 @@ int main(int argc, char const * argv[]) {
 
 	bettors = mmap(NULL, sizeof(*bettors), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(bettors == MAP_FAILED) {
-		log_send(LEVEL_ERROR, "[MAIN SV] Can't create neccessary data to operate.");
+		fprintf(stderr, "Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	clients = mmap(NULL, sizeof(*clients), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(clients == MAP_FAILED) {
-		log_send(LEVEL_ERROR, "[MAIN SV] Can't create neccessary data to operate.");
+		fprintf(stderr, "Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	winner = mmap(NULL, sizeof(*winner), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(winner == MAP_FAILED) {
-		log_send(LEVEL_ERROR, "[MAIN SV] Can't create neccessary data to operate.");
+		fprintf(stderr, "Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -132,6 +132,7 @@ int main(int argc, char const * argv[]) {
 			(*clients)++;
 			sem_unlock(server_sems, 1);
 			server_ajar(connection);
+			log_send(LEVEL_INFO, "[CHILD SV] Disconnecting main connection.");
 
 			ret = handle(connection_accepted);
 			if(ret == EXIT_FAILURE) {
@@ -139,6 +140,7 @@ int main(int argc, char const * argv[]) {
 			}
 
 			server_close(connection_accepted);
+			log_send(LEVEL_INFO, "[CHILD SV] Closed client connection.");
 			sem_lock(server_sems, 1);
 			(*clients)--;
 			sem_unlock(server_sems, 1);
@@ -165,8 +167,8 @@ static void handle_int(int sign) {
 		if(!db_close(database)) {
 			log_send(LEVEL_ERROR, "[MAIN SV] Couldn't correctly logout from database.");
 		}
-		log_close();
 		sem_remove(server_sems);
+		log_close();
 		exit(EXIT_FAILURE);
 	} else if(sign == SIGCHLD) {
 		int status;

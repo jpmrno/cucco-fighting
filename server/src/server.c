@@ -61,19 +61,19 @@ int main(int argc, char const * argv[]) {
 	// 	exit(EXIT_FAILURE);
 	// }
 
-	bettors = mmap(NULL, sizeof(*bettors), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	bettors = mmap(NULL, sizeof(*bettors), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(bettors == MAP_FAILED) {
 		log_send(LEVEL_ERROR, "[MAIN SV] Can't create neccessary data to operate.");
 		exit(EXIT_FAILURE);
 	}
 
-	clients = mmap(NULL, sizeof(*clients), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	clients = mmap(NULL, sizeof(*clients), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(clients == MAP_FAILED) {
 		log_send(LEVEL_ERROR, "[MAIN SV] Can't create neccessary data to operate.");
 		exit(EXIT_FAILURE);
 	}
 
-	winner = mmap(NULL, sizeof(*winner), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
+	winner = mmap(NULL, sizeof(*winner), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(winner == MAP_FAILED) {
 		log_send(LEVEL_ERROR, "[MAIN SV] Can't create neccessary data to operate.");
 		exit(EXIT_FAILURE);

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <dbsvlib.h>
 #include <random.h>
-#include <semaphore.h>
+#include <semaphores.h>
 #include <server.h> // TODO: Remove
 #include <stdio.h> // TODO: Remove
 

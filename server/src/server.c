@@ -12,10 +12,16 @@
 #include <smemory.h>
 #include <sys/mman.h>
 #include <log.h>
+#include <time.h>
+#include <random.h>
+#include <server.h>
+#include <semaphores.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 
 #define MONEY_DEFAULT 50
+
+#define SEM_SIZE 4
 
 static void handle_int(int sign);
 static int handle(connection_t connection);
@@ -30,9 +36,12 @@ static smemory_t database = NULL;
 
 static double client_money = MONEY_DEFAULT;
 
+int server_sems = -1;
+
 int main(int argc, char const * argv[]) {
 	const char * config_file;
 	int connection_numer = 0, ret, pid;
+	short vals[SEM_SIZE] = {-1, -1, 0, -1};
 	// key_t key;
 
 	switch(argc) {
@@ -50,16 +59,14 @@ int main(int argc, char const * argv[]) {
 		}
 	}
 
-	if(!log_open()) {
-		fprintf(stderr, "Can't connect logging server.\n");
+	pcg32_srandom(time(NULL), (intptr_t)&connection_numer);
+
+	server_sems = sem_make(3243, SEM_SIZE, vals);
+	if(server_sems == -1) {
+		fprintf(stderr, "Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
-
-	// key = ftok("", 0); // TODO: ID define (0)
-	// if(key == -1) {
-	// 	fprintf(stderr, "Configuration file's path does not exist or cannot be accessed.\n");
-	// 	exit(EXIT_FAILURE);
-	// }
+	printf("LOCK: %d\n", server_sems);
 
 	bettors = mmap(NULL, sizeof(*bettors), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(bettors == MAP_FAILED) {
@@ -82,6 +89,11 @@ int main(int argc, char const * argv[]) {
 	*bettors = 0;
 	*clients = 0;
 	*winner = NULL;
+
+	if(!log_open()) {
+		fprintf(stderr, "Can't connect logging server.\n");
+		exit(EXIT_FAILURE);
+	}
 
 	database = smemory_open(8080); // TODO: define 8080
 	if(database == NULL) {
@@ -116,7 +128,9 @@ int main(int argc, char const * argv[]) {
 		}
 
 		if(!pid) { // Child process
+			sem_lock(server_sems, 1);
 			(*clients)++;
+			sem_unlock(server_sems, 1);
 			server_ajar(connection);
 
 			ret = handle(connection_accepted);
@@ -125,7 +139,9 @@ int main(int argc, char const * argv[]) {
 			}
 
 			server_close(connection_accepted);
+			sem_lock(server_sems, 1);
 			(*clients)--;
+			sem_unlock(server_sems, 1);
 			exit(ret);
 		}
 
@@ -134,8 +150,11 @@ int main(int argc, char const * argv[]) {
 	}
 
 	server_close(connection);
-	smemory_close(database);
+	if(db_close(database)) {
+		log_send(LEVEL_ERROR, "[MAIN SV] Couldn't correctly logout from database.");
+	}
 	log_close();
+	sem_remove(server_sems);
 
 	return 0;
 }
@@ -143,8 +162,11 @@ int main(int argc, char const * argv[]) {
 static void handle_int(int sign) {
 	if(sign == SIGINT) {
 		server_close(connection);
-		smemory_close(database);
+		if(db_close(database)) {
+			log_send(LEVEL_ERROR, "[MAIN SV] Couldn't correctly logout from database.");
+		}
 		log_close();
+		sem_remove(server_sems);
 		exit(EXIT_FAILURE);
 	} else if(sign == SIGCHLD) {
 		int status;
@@ -176,7 +198,7 @@ static int run(connection_t connection, int op) {
 		} break;
 
 		case CUCCO_ADD: {
-			if(!cucco_add(connection)) {
+			if(!cucco_add(connection, database)) {
 				log_send(LEVEL_ERROR, "Error adding the cucco.");
 				return -1;
 			}else{
@@ -185,7 +207,7 @@ static int run(connection_t connection, int op) {
 		} break;
 
 		case CUCCO_REMOVE: {
-			if(!cucco_remove(connection)) {
+			if(!cucco_remove(connection, database)) {
 				log_send(LEVEL_ERROR, "Error removing the cucco.");
 				return -1;
 			}else{
@@ -194,7 +216,7 @@ static int run(connection_t connection, int op) {
 		} break;
 
 		case LIST: {
-			if(list(connection)) {
+			if(list(connection, database)) {
 				log_send(LEVEL_ERROR, "Error getting the list of cuccos.");
 				return -1;
 			}else{
@@ -203,7 +225,7 @@ static int run(connection_t connection, int op) {
 		} break;
 
 		case BET: {
-			if(!bet(connection, &client_money, clients, bettors, winner)) {
+			if(!bet(connection, &client_money, clients, bettors, winner, database)) {
 				log_send(LEVEL_ERROR, "Error placing bet.");
 				return -1;
 			}else{
@@ -221,11 +243,7 @@ static int run(connection_t connection, int op) {
 		} break;
 
 		case EXIT: {
-			if(!logout(connection)) {
-				log_send(LEVEL_ERROR, "Error exiting");
-				return -1;
-			}
-			log_send(LEVEL_INFO, "Succesfully exited");
+			log_send(LEVEL_INFO, "Exiting.");
 			return 1;
 		} break;
 

@@ -11,14 +11,14 @@
 #define CONFIG_FILE_DEFAULT "config.ini"
 
 static void handle_int(int sign);
-static void print_help();
+static void help();
 static void intro();
 static void menu();
-static void print_cuccos();
-static void print_money();
-static void reset_money();
-static void add_cucco();
-static void remove_cucco();
+static void cuccos_list();
+static void money_print();
+static void money_reset();
+static void cuccos_add();
+static void cuccos_remove();
 static void place_bet();
 static void client_exit();
 
@@ -69,25 +69,25 @@ static void menu() {
 		fgets(buffer, 255, stdin);
 
 		if(strcmp(buffer,"list\n") == 0){
-			print_cuccos();
+			cuccos_list();
 
 		}else if (strcmp(buffer, "bet\n") == 0){
 			place_bet();
 
 		}else if(strcmp(buffer, "wallet\n") == 0){
-			print_money();
+			money_print();
 
 		}else if(strcmp(buffer, "kaching\n") == 0){
-			reset_money();
+			money_reset();
 
 		}else if((strcmp(buffer, "help\n")) == 0 || (strcmp(buffer, "man\n")) == 0){
-			print_help();
+			help();
 
 		}else if(strcmp(buffer, "add\n")== 0){
-			add_cucco();
+			cuccos_add();
 
 		}else if(strcmp(buffer, "remove\n") == 0){
-			remove_cucco();
+			cuccos_remove();
 
 		}else if(strcmp(buffer, "exit\n")== 0){
 			alive = 0;
@@ -98,7 +98,7 @@ static void menu() {
 	}
 }
 
-static void print_help() {
+static void help() {
 	printf(" _         _   \n");
 	printf("| |_  ___ | | __\n");
 	printf("| . |/ ._>| || . \\\n");
@@ -115,37 +115,53 @@ static void print_help() {
 	printf("-exit: Exit.\n");
 }
 
-static void add_cucco() {
-	printf("Type the name of the cucco you would like to add.\n");
+static void cuccos_add() {
 	char cucco[30];
+	int ret;
+
+	printf("Type the name of the cucco you would like to add:\n");
 	bzero(cucco, 30);
 	fgets(cucco, 29, stdin);
-	printf("\n%s\n", cucco);
 
-	if(cucco_add(connection, cucco) < OK) { // TODO: Cambiar de lugar
+	ret = cucco_add(connection, cucco);
+	if(ret < OK) { // TODO: Cambiar de lugar
 		fprintf(stderr, "No se pudo cucco_add al servidor.\n");
 		server_disconnect(connection);
 		exit(EXIT_FAILURE);
 	}
+
+	if(ret) {
+		printf("Cucco '%s' added successfuly.\n", cucco);
+	} else {
+		printf("Couldn't add cucco '%s'.\n", cucco);
+	}
 }
 
-static void remove_cucco() {
-	printf("Type the name of the cucco you would like to remove.\n");
+static void cuccos_remove() {
 	char cucco[30];
+	int ret;
+
+	printf("Type the name of the cucco you would like to remove:\n");
 	bzero(cucco, 30);
 	fgets(cucco, 29, stdin);
-	printf("\n%s\n", cucco);
 
-	if(cucco_remove(connection, cucco) < OK) { // TODO: Cambiar de lugar
+	ret = cucco_remove(connection, cucco);
+	if(ret < OK) { // TODO: Cambiar de lugar
 		fprintf(stderr, "No se pudo cucco_remove al servidor.\n");
 		server_disconnect(connection);
 		exit(EXIT_FAILURE);
 	}
+
+	if(ret) {
+		printf("Cucco '%s' removed successfuly.\n", cucco);
+	} else {
+		printf("Couldn't remove cucco '%s'.\n", cucco);
+	}
 }
 
-static void print_cuccos() {
+static void cuccos_list() {
 	char ** cuccos; // Remember to free! // TODO: Remove
-	int length, j;
+	int length, i;
 
 	if(list(connection, &cuccos, &length) < OK) { // TODO: Cambiar de lugar
 		fprintf(stderr, "No se pudo listear al servidor.\n");
@@ -153,12 +169,14 @@ static void print_cuccos() {
 		exit(EXIT_FAILURE);
 	}
 
-	for(j = 0; j < length; j++) {
-		printf("%s\n", cuccos[j]);
+	for(i = 0; i < length; i++) {
+		printf("%s\t", cuccos[i]);
+		free(cuccos[i]);
 	}
+	free(cuccos);
 }
 
-static void print_money() {
+static void money_print() {
 	double wallet;
 
 	wallet = money(connection);
@@ -171,7 +189,7 @@ static void print_money() {
 	printf("You have: %f cuccope$o$\n", wallet);
 }
 
-static void reset_money() {
+static void money_reset() {
 	if(reset(connection) < OK) { // TODO: Cambiar de lugar
 		fprintf(stderr, "No se pudo resetear al servidor.\n");
 		server_disconnect(connection);
@@ -190,8 +208,10 @@ static void reset_money() {
 }
 
 static void place_bet() {
-	printf("Enter the name of the cucco you would like to place a bet on.\n");
+	char * winner = NULL;
 	char cucco[30];
+
+	printf("Enter the name of the cucco you would like to place a bet on.\n");
 	bzero(cucco, 30);
 	fgets(cucco, 29, stdin);
 	printf("\n%s\n", cucco);
@@ -223,16 +243,18 @@ static void place_bet() {
 	}
 
 	float bett= atof(buff);
-	int ret = bet(connection, cucco, bett);
-	if(!ret) {
+	winner = bet(connection, cucco, bett);
+	if(winner == NULL) {
 		fprintf(stderr, "No se pudo bettear al servidor.\n");
 		server_disconnect(connection);
 	}
+
+	printf("The winner is... %s\n", winner);
 }
 
 static void client_exit() {
 	if(!logout(connection)) {
-		fprintf(stderr, "Couldn't logout from server.\n");
+		fprintf(stderr, "Couldn't correctly logout from server.\n");
 	}
 	server_disconnect(connection);
 }

@@ -62,7 +62,7 @@ smemory_t smemory_make(key_t key) {
 int smemory_remove(smemory_t smemory) {
 	shm_t * shm = (shm_t *) smemory;
 
-	if(smemory == NULL) {
+	if(shm == NULL) {
 		return TRUE;
 	}
 
@@ -112,7 +112,7 @@ int smemory_close(smemory_t smemory) {
 	shm_t * shm = (shm_t *) smemory;
 
 	if(shm == NULL) {
-		return FALSE;
+		return TRUE;
 	}
 
 	return !shmdt(shm->addr_size);

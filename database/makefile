@@ -6,7 +6,7 @@ SRC_C = src
 SRC_HEADERS = ../$(LIBS_HEADERS) include ../comapi/db_sv
 SRC_LIBS = ../$(LIBS_PATH)
 SRC_API = ../comapi/db_sv
-LIBS = semaphores
+LIBS = semaphores serial
 GCC_FLAGS += -DDS_SERVER
 # ---------------------------- #
 

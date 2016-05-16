@@ -126,27 +126,28 @@ int list(connection_t connection, char *** list, int * length) {
 	return read_sa(connection, list, length);
 }
 
-int bet(connection_t connection, char * cucco, double money) {
-	int ret, value;
+char * bet(connection_t connection, char * cucco, double money) {
+	int ret;
+	char* winner;
 
 	assert(connection != NULL);
 
 	ret = opcode(connection, BET);
 	if(ret < OK) {
-		return ret;
+		return NULL;
 	}
 
 	ret = write_sf(connection, cucco, money);
 	if(ret < OK) {
-		return ret;
+		return NULL;
 	}
 
-	ret = read_i(connection, &value);
+	ret = read_s(connection, &winner);
 	if(ret < OK) {
-		return ret;
+		return NULL;
 	}
 
-	return value;
+	return winner;
 }
 
 int reset(connection_t connection) {
@@ -168,21 +169,9 @@ int reset(connection_t connection) {
 }
 
 int logout(connection_t connection) {
-	int ret, value;
-
 	assert(connection != NULL);
 
-	ret = opcode(connection, EXIT);
-	if(ret < OK) {
-		return ret;
-	}
-
-	ret = read_i(connection, &value);
-	if(ret < OK) {
-		return ret;
-	}
-
-	return value;
+	return opcode(connection, EXIT) < OK ? FALSE : TRUE;
 }
 
 static int opcode(connection_t connection, opcode_t op) {

@@ -173,7 +173,7 @@ static connection_t mkserver(char * address, ...) {
 	network_t * network;
 	pipe_t read;
 
-	pcg32_srandom(time(NULL), (intptr_t)&read);
+	// pcg32_srandom(time(NULL), (intptr_t)&read); // TODO: Test
 
 	read = pipe_make(address, FALSE);
 	if(read == NULL) {

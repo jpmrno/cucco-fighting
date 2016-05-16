@@ -263,7 +263,7 @@ static int db_cuccos(void * buffer, size_t size, char *** cuccos, int * length) 
 	int i = 0;
 
 	node = tpl_map("A(s)", &s);
-	if(tpl_load(node, TPL_MEM | TPL_UFREE, buffer, size) == -1) {
+	if(tpl_load(node, TPL_MEM, buffer, size) == -1) {
 		return FALSE;
 	}
 	*length = tpl_Alen(node, 1);
@@ -302,6 +302,8 @@ static int list_request(char *** cuccos, int * length, smemory_t database) {
 		free(buffer);
 		return FALSE;
 	}
+
+	free(buffer);
 
 	return TRUE;
 }

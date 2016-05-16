@@ -64,7 +64,7 @@ int main(int argc, char const * argv[]) {
 
 	pcg32_srandom(time(NULL), (intptr_t)&connection_numer);
 
-	server_sems = sem_make(1234, SEM_SIZE, vals);
+	server_sems = sem_make(6547, SEM_SIZE, vals);
 	if(server_sems == -1) {
 		fprintf(stderr, "1 Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
@@ -95,7 +95,7 @@ int main(int argc, char const * argv[]) {
 
 	if(!log_open()) {
 		fprintf(stderr, "Can't connect logging server.\n");
-		exit(EXIT_FAILURE);
+		//exit(EXIT_FAILURE);
 	}
 
 	database = smemory_open(8080); // TODO: define 8080

@@ -194,7 +194,7 @@ static mq_t * mq_new(char * name, mqd_t queue) {
 		return NULL;
 	}
 
-	mqueue->name = malloc(sizeof(char) * strlen(name));
+	mqueue->name = malloc(sizeof(char) * (strlen(name) + 1));
 	if(mqueue->name == NULL) {
 		free(mqueue);
 		return NULL;

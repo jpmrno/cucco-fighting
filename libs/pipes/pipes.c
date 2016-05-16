@@ -68,7 +68,7 @@ pipe_t pipe_open(char * address, int write) {
 		return NULL;
 	}
 
-	pipe->address = malloc(sizeof(char) * strlen(address));
+	pipe->address = malloc(sizeof(char) * (strlen(address) + 1));
 	if(pipe->address == NULL) {
 		close(file);
 		free(pipe);

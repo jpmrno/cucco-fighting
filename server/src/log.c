@@ -28,7 +28,7 @@ int log_send(level_t level, char * message){
 
 	msg->type = 1; // TODO: Define 1
 	msg->level = level;
-	memcpy(msg->text, message, sizeof(char) * strlen(message));
+	memcpy(msg->text, message, sizeof(char) * (strlen(message) + 1));
 
 	return mq_send(mq, msg);
 }

@@ -155,11 +155,15 @@ int smemory_read(smemory_t smemory, void ** data, size_t * size) {
 	assert(shm != NULL);
 
 	#ifdef DS_SERVER
-	sem_lock(shm->sem, SEM_CLIENT); // Esperamos al cliente
+	if(!sem_lock(shm->sem, SEM_CLIENT)) { // Esperamos al cliente
+		return FALSE;
+	}
 	#endif
 	#ifdef DS_CLIENT
 	// assert(shm->wrote);
-	sem_lock(shm->sem, SEM_SERVER); // Esperamos al servidor
+	if(!sem_lock(shm->sem, SEM_SERVER)) { // Esperamos al cliente
+		return FALSE;
+	}
 	#endif
 
 	memcpy(size, shm->addr_size, SMEM_SIZE);

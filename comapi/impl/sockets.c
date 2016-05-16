@@ -263,7 +263,7 @@ static network_t * network_new(char * address, int sockfd, int port_n) {
 		return NULL;
 	}
 
-	network->address = malloc(sizeof(char) * strlen(address));
+	network->address = malloc(sizeof(char) * (strlen(address) + 1));
 	if(network->address == NULL) {
 		free(network);
 		return NULL;

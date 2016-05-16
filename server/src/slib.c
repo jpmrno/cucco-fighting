@@ -16,8 +16,6 @@ int opcode(connection_t connection) { // TODO: Change to opcode_t
 		return ret;
 	}
 
-	printf("(OPCODE) -> %d\n", value);
-
 	return value;
 }
 
@@ -51,8 +49,6 @@ int opcode(connection_t connection) { // TODO: Change to opcode_t
 int money(connection_t connection, double money) {
 	assert(connection != NULL);
 
-	printf("(MONEY)\n");
-
 	return !(write_d(connection, money) < OK);
 }
 
@@ -65,8 +61,6 @@ int cucco_add(connection_t connection) {
 	if(read_s(connection, &cucco) < OK) {
 		return FALSE;
 	}
-
-	printf("(ADD) -> %s\n", cucco);
 
 	// TODO:
 	value = 95;
@@ -84,8 +78,6 @@ int cucco_remove(connection_t connection) {
 		return FALSE;
 	}
 
-	printf("(REMOVE) -> %s\n", cucco);
-
 	// TODO:
 	value = 95;
 
@@ -94,8 +86,6 @@ int cucco_remove(connection_t connection) {
 
 int list(connection_t connection) {
 	assert(connection != NULL);
-
-	printf("(LIST)\n");
 
 	// TODO:
 	char * cuccos[5] = {"Cucco 1", "Cucco 2", "Cucco 3", "Cucco 4", "Cucco 5"};
@@ -132,7 +122,7 @@ int bet(connection_t connection, double * wallet, int * clients, int * bettors, 
 		if(*bettors == *clients) {
 			printf("FIGHT INIT: %d/%d\n", *bettors, *clients);
 			*winner = "asd";
-			// TODO: figth();
+			// TODO: fight();
 		}
 		printf("BETTORS: %d\n", *bettors);
 		while(*winner == NULL);
@@ -156,8 +146,6 @@ int reset(connection_t connection) {
 
 	assert(connection != NULL);
 
-	printf("(RESET)\n");
-
 	value = TRUE;
 
 	return !(write_i(connection, value) < OK);
@@ -167,8 +155,6 @@ int logout(connection_t connection) {
 	int value;
 
 	assert(connection != NULL);
-
-	printf("(EXIT)\n");
 
 	value = TRUE;
 

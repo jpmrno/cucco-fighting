@@ -129,7 +129,7 @@ int main(int argc, char const * argv[]) {
 			exit(ret);
 		}
 
-		log_send(LEVEL_INFO, "[MAIN SV] Desconectando nueva conexion.");
+		log_send(LEVEL_INFO, "[MAIN SV] Disconnecting new connection.");
 		server_ajar(connection_accepted);
 	}
 
@@ -168,54 +168,64 @@ static int run(connection_t connection, int op) {
 	switch(op) {
 		case MONEY: {
 			if(!money(connection, client_money)) {
-				log_send(LEVEL_ERROR, "Error en el money.");
+				log_send(LEVEL_ERROR, "Error getting the money.");
 				return -1;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully got money.");
 			}
 		} break;
 
 		case CUCCO_ADD: {
 			if(!cucco_add(connection)) {
-				log_send(LEVEL_ERROR, "Error en el add.");
+				log_send(LEVEL_ERROR, "Error adding the cucco.");
 				return -1;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully added cucco.");
 			}
 		} break;
 
 		case CUCCO_REMOVE: {
 			if(!cucco_remove(connection)) {
-				log_send(LEVEL_ERROR, "Error en el remove.");
+				log_send(LEVEL_ERROR, "Error removing the cucco.");
 				return -1;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully removed cucco.");
 			}
 		} break;
 
 		case LIST: {
 			if(list(connection)) {
-				log_send(LEVEL_ERROR, "Error en el list.");
+				log_send(LEVEL_ERROR, "Error getting the list of cuccos.");
 				return -1;
+			}else{
+				log_send(LEVEL_INFO, "Sucesfully returned list of cuccos");
 			}
 		} break;
 
 		case BET: {
 			if(!bet(connection, &client_money, clients, bettors, winner)) {
-				log_send(LEVEL_ERROR, "Error en el bet.");
+				log_send(LEVEL_ERROR, "Error placing bet.");
 				return -1;
+			}else{
+				log_send(LEVEL_INFO, "Succesfully placed bet.");
 			}
 		} break;
 
 		case RESET: {
 			if(!reset(connection)) {
-				log_send(LEVEL_ERROR, "Error en el reset.");
+				log_send(LEVEL_ERROR, "Error reseting the amount of money");
 				return -1;
 			}
-
+			log_send(LEVEL_INFO, "Succesfully reseted the users amount of money");
 			client_money = MONEY_DEFAULT;
 		} break;
 
 		case EXIT: {
 			if(!logout(connection)) {
-				log_send(LEVEL_ERROR, "Error en el exit.");
+				log_send(LEVEL_ERROR, "Error exiting");
 				return -1;
 			}
-
+			log_send(LEVEL_INFO, "Succesfully exited");
 			return 1;
 		} break;
 

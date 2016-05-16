@@ -123,6 +123,7 @@ int main(int argc, char const * argv[]) {
 		}
 
 		connection_numer++;
+		(*clients)++;
 
 		pid = fork();
 		if(pid == -1) {
@@ -131,9 +132,9 @@ int main(int argc, char const * argv[]) {
 		}
 
 		if(!pid) { // Child process
-			sem_lock(server_sems, 1);
-			(*clients)++;
-			sem_unlock(server_sems, 1);
+			// sem_lock(server_sems, 1);
+			// (*clients)++;
+			// sem_unlock(server_sems, 1);
 			server_ajar(connection);
 			log_send(LEVEL_INFO, "[CHILD SV] Disconnecting main connection.");
 
@@ -144,9 +145,9 @@ int main(int argc, char const * argv[]) {
 
 			server_close(connection_accepted);
 			log_send(LEVEL_INFO, "[CHILD SV] Closed client connection.");
-			sem_lock(server_sems, 1);
-			(*clients)--;
-			sem_unlock(server_sems, 1);
+			// sem_lock(server_sems, 1);
+			// (*clients)--;
+			// sem_unlock(server_sems, 1);
 			exit(ret);
 		}
 
@@ -176,6 +177,7 @@ static void handle_int(int sign) {
 	} else if(sign == SIGCHLD) {
 		int status;
 
+		(*clients)--;
 		waitpid(-1, &status, 0);
 	}
 }

@@ -22,7 +22,7 @@ int log_open(){
 int log_send(level_t level, char * message){
 	qmessage_t * msg = malloc(sizeof(qmessage_t));
 
-	if(msg == NULL){
+	if(mq == NULL || msg == NULL) {
 		return FALSE;
 	}
 

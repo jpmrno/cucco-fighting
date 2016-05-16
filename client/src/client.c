@@ -387,19 +387,13 @@ static void running_chicken() {
 			printf(" ");
 		}
 		printf("   -'=   \n");
-		printf("Bye Bye :)\n");
+		printf("\t\tBye Bye :)\n");
 		
 		usleep(10500);
 		
 		i++;
 	}
 	
-	// system("clear");
-	// printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
-	// printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
-	// printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
-	// printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
-	// printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
 }
 
 static void fighting_cuccos(){

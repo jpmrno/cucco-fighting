@@ -387,6 +387,7 @@ static void running_chicken() {
 			printf(" ");
 		}
 		printf("   -'=   \n");
+		printf("Bye Bye :)\n");
 		
 		usleep(10500);
 		

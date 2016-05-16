@@ -61,28 +61,28 @@ int main(int argc, char const * argv[]) {
 
 	pcg32_srandom(time(NULL), (intptr_t)&connection_numer);
 
-	server_sems = sem_make(3243, SEM_SIZE, vals);
+	server_sems = sem_make(1234, SEM_SIZE, vals);
 	if(server_sems == -1) {
-		fprintf(stderr, "Can't create neccessary data to operate.\n");
+		fprintf(stderr, "1 Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
 	printf("LOCK: %d\n", server_sems);
 
 	bettors = mmap(NULL, sizeof(*bettors), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(bettors == MAP_FAILED) {
-		fprintf(stderr, "Can't create neccessary data to operate.\n");
+		fprintf(stderr, "2 Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	clients = mmap(NULL, sizeof(*clients), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(clients == MAP_FAILED) {
-		fprintf(stderr, "Can't create neccessary data to operate.\n");
+		fprintf(stderr, "3 Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	winner = mmap(NULL, sizeof(*winner), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(winner == MAP_FAILED) {
-		fprintf(stderr, "Can't create neccessary data to operate.\n");
+		fprintf(stderr, "4 Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
 

@@ -80,6 +80,7 @@ static void handle_int(int sign) {
 }
 
 static int handle_stdout() {
+	system("clear");
 	qmessage_t* msg = malloc(sizeof(qmessage_t));
 	if(msg == NULL){
 		exit(EXIT_FAILURE);

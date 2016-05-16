@@ -162,7 +162,7 @@ int main(int argc, char const * argv[]) {
 static void handle_int(int sign) {
 	if(sign == SIGINT) {
 		server_close(connection);
-		if(db_close(database)) {
+		if(!db_close(database)) {
 			log_send(LEVEL_ERROR, "[MAIN SV] Couldn't correctly logout from database.");
 		}
 		log_close();

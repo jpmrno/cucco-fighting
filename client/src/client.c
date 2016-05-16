@@ -22,6 +22,7 @@ static void cuccos_remove();
 static void place_bet();
 static void client_exit();
 static float get_bett();
+static void start();
 
 static connection_t connection = NULL;
 
@@ -43,9 +44,6 @@ int main(int argc, char const * argv[]) {
 			exit(EXIT_FAILURE);
 		}
 	}
-	
-	
-
 	connection = server_connect(config_file);
 	if(connection == NULL) {
 		fprintf(stderr, "No se pudo conectar al servidor.\n");
@@ -56,7 +54,8 @@ int main(int argc, char const * argv[]) {
 		intro();
 	}
 	signal(SIGINT, handle_int);
-
+	
+	start();
 	menu();
 	return 0;
 }
@@ -321,4 +320,17 @@ static void intro() {
 	printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
 	printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
 	printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
+}
+
+static void start(){
+	char c;
+	printf("Press enter to start the program\n");
+	while((c=getchar())!= '\n'){
+		system("clear");
+		printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
+		printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
+		printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
+		printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
+		printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
+	}
 }

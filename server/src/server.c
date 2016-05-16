@@ -150,7 +150,7 @@ int main(int argc, char const * argv[]) {
 	}
 
 	server_close(connection);
-	if(db_close(database)) {
+	if(!db_close(database)) {
 		log_send(LEVEL_ERROR, "[MAIN SV] Couldn't correctly logout from database.");
 	}
 	log_close();
@@ -243,7 +243,7 @@ static int run(connection_t connection, int op) {
 		} break;
 
 		case EXIT: {
-			log_send(LEVEL_INFO, "Exiting.");
+			log_send(LEVEL_INFO, "[CHILD SV] Exiting.");
 			return 1;
 		} break;
 

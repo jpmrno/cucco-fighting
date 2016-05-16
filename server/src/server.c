@@ -64,7 +64,7 @@ int main(int argc, char const * argv[]) {
 
 	pcg32_srandom(time(NULL), (intptr_t)&connection_numer);
 
-	server_sems = sem_make(6547, SEM_SIZE, vals);
+	server_sems = sem_make(1117, SEM_SIZE, vals);
 	if(server_sems == -1) {
 		fprintf(stderr, "1 Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);

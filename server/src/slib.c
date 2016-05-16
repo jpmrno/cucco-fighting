@@ -79,13 +79,13 @@ int cucco_add(connection_t connection, smemory_t database) {
 	}
 
 	if(!db_opcode(&buffer, &size, DB_ADD, cucco)) {
-		free(cucco);
+		//free(cucco);
 		return FALSE;
 	}
 
 	if(!smemory_write(database, buffer, size)) {
-		free(cucco);
-		free(buffer);
+		//free(cucco);
+		//free(buffer);
 		return FALSE;
 	}
 
@@ -97,7 +97,7 @@ int cucco_add(connection_t connection, smemory_t database) {
 	}
 
 	if(!db_return(buffer, size, &ret)) {
-		free(buffer);
+		//free(buffer);
 		return FALSE;
 	}
 
@@ -120,13 +120,13 @@ int cucco_remove(connection_t connection, smemory_t database) {
 	}
 
 	if(!db_opcode(&buffer, &size, DB_REMOVE, cucco)) {
-		free(cucco);
+		//free(cucco);
 		return FALSE;
 	}
 
 	if(!smemory_write(database, buffer, size)) {
-		free(cucco);
-		free(buffer);
+		//free(cucco);
+		//free(buffer);
 		return FALSE;
 	}
 
@@ -138,7 +138,7 @@ int cucco_remove(connection_t connection, smemory_t database) {
 	}
 
 	if(!db_return(buffer, size, &ret)) {
-		free(buffer);
+		//free(buffer);
 		return FALSE;
 	}
 
@@ -227,7 +227,7 @@ int db_close(smemory_t database) {
 	}
 
 	if(!smemory_write(database, buffer, size)) {
-		free(buffer);
+		//free(buffer);
 		return FALSE;
 	}
 
@@ -288,7 +288,7 @@ static int list_request(char *** cuccos, int * length, smemory_t database) {
 	}
 
 	if(!smemory_write(database, buffer, size)) {
-		free(buffer);
+		//free(buffer);
 		return FALSE;
 	}
 
@@ -299,7 +299,7 @@ static int list_request(char *** cuccos, int * length, smemory_t database) {
 	}
 
 	if(!db_cuccos(buffer, size, cuccos, length)) {
-		free(buffer);
+		//free(buffer);
 		return FALSE;
 	}
 

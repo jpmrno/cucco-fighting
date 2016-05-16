@@ -216,7 +216,7 @@ static int run(connection_t connection, int op) {
 		} break;
 
 		case LIST: {
-			if(list(connection, database)) {
+			if(!list(connection, database)) {
 				log_send(LEVEL_ERROR, "Error getting the list of cuccos.");
 				return -1;
 			}else{

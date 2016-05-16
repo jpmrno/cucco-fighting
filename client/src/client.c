@@ -45,15 +45,16 @@ int main(int argc, char const * argv[]) {
 			exit(EXIT_FAILURE);
 		}
 	}
+	while(i++ < 2) {  
+		intro();
+	}
+	
 	connection = server_connect(config_file);
 	if(connection == NULL) {
-		fprintf(stderr, "No se pudo conectar al servidor.\n");
+		fprintf(stderr, "Couldnt connect to the server.\n");
 		exit(EXIT_FAILURE);
 	}
 	
-	while(i++ < 2) { // TODO: Nati gato
-		intro();
-	}
 	signal(SIGINT, handle_int);
 	
 	start();
@@ -243,7 +244,6 @@ static void place_bet() {
 			printf("That cucco does not exist. These are the possible cuccos:\n");
 			cuccos_list();
 		}
-		
 		char c;
 		int i=0;
 		while((c=getchar()) != '\n'){
@@ -267,6 +267,7 @@ static void place_bet() {
 	printf("The winner is... %s\n", winner);
 }
 
+//TODO: verificar desde el servidor
 static int cucco_exist(char* cucco) {
 	char ** cuccos;
 	int length, i;
@@ -296,7 +297,7 @@ static float get_bett() {
 	while(aux == 1){
 		int flag = 0;
 		int point = 0;
-		fgets(buff, 29,stdin);
+		fgets(buff, 29, stdin);
 		int i;
 		int length = strlen(buff);
 		for(i=0; i<length; i++){

@@ -23,6 +23,7 @@ static void place_bet();
 static void client_exit();
 static float get_bett();
 static void start();
+static int cucco_exist(char* cucco);
 
 static connection_t connection = NULL;
 
@@ -75,7 +76,7 @@ static void menu() {
 		}else if (strcmp(buffer, "bet\n") == 0){
 			place_bet();
 
-		}else if(strcmp(buffer, "wallet\n") == 0 || strcmp(buffer, "money") == 0){
+		}else if(strcmp(buffer, "wallet\n") == 0 || strcmp(buffer, "money\n") == 0){
 			money_print();
 
 		}else if(strcmp(buffer, "kaching\n") == 0){
@@ -122,13 +123,21 @@ static void print_help() {
 }
 
 static void cuccos_add() {
-	char cucco[30];
-	int ret;
-
 	printf("Type the name of the cucco you would like to add:\n");
-	bzero(cucco, 30);
-	fgets(cucco, 29, stdin);
-
+	char cucco[30];
+	int ret, i=0;
+	char c;
+	
+	while((c=getchar()) != '\n'){
+		cucco[i++] = c; 
+	}
+	cucco[i]=0;
+	
+	if(cucco_exist(cucco)){
+		printf("That cucco already exists.\n");
+		return;
+	}
+	
 	ret = cucco_add(connection, cucco);
 	if(ret < OK) { // TODO: Cambiar de lugar
 		fprintf(stderr, "The cucco could not be added.\n");
@@ -144,12 +153,19 @@ static void cuccos_add() {
 }
 
 static void cuccos_remove() {
-	char cucco[30];
-	int ret;
-
 	printf("Type the name of the cucco you would like to remove:\n");
-	bzero(cucco, 30);
-	fgets(cucco, 29, stdin);
+	char cucco[30];
+	int ret, i=0;
+	char c;
+	
+	while((c=getchar()) != '\n'){
+		cucco[i++] = c; 
+	}
+	cucco[i]=0;
+	if(!cucco_exist(cucco)){
+		printf("The cucco does not exist.\n");
+		return;
+	}
 
 	ret = cucco_remove(connection, cucco);
 	if(ret < OK) { // TODO: Cambiar de lugar
@@ -174,9 +190,9 @@ static void cuccos_list() {
 		server_disconnect(connection);
 		exit(EXIT_FAILURE);
 	}
-
+	printf("\nCuccos:\n");
 	for(i = 0; i < length; i++) {
-		printf("%s\t", cuccos[i]);
+		printf("%s\n", cuccos[i]);
 		free(cuccos[i]);
 	}
 	free(cuccos);
@@ -218,14 +234,28 @@ static void place_bet() {
 	char * winner = NULL;
 	float bett;
 	char cucco[50];
-
-	printf("Enter the name of the cucco you would like to place a bet on.\n");
-	char c;
-	int i=0;
-	while((c=getchar()) != '\n'){
-		cucco[i++] = c;
+	int flag = 1;
+	
+	while(flag){
+		if(flag == 1){
+			printf("Enter the name of the cucco you would like to place a bet on.\n");
+		}else if(flag == 2){
+			printf("That cucco does not exist. These are the possible cuccos:\n");
+			cuccos_list();
+		}
+		
+		char c;
+		int i=0;
+		while((c=getchar()) != '\n'){
+			cucco[i++] = c;
+		}
+		cucco[i] = 0;
+		if(cucco_exist(cucco)){
+			flag=0;
+		}else{
+			flag=2;
+		}
 	}
-	cucco[i] = 0;
 
 	bett = get_bett();
 	winner = bet(connection, cucco, bett);
@@ -237,7 +267,28 @@ static void place_bet() {
 	printf("The winner is... %s\n", winner);
 }
 
-static float get_bett(){
+static int cucco_exist(char* cucco) {
+	char ** cuccos;
+	int length, i;
+	int ans = 0;
+
+	if(list(connection, &cuccos, &length) < OK) {
+		fprintf(stderr, "The list of cuccos couldnt be obtained.\n");
+		server_disconnect(connection);
+		exit(EXIT_FAILURE);
+	}
+
+	for(i = 0; i < length; i++) {
+		if(strcmp(cucco, cuccos[i]) == 0){
+			ans = 1;
+		}
+		free(cuccos[i]);
+	}
+	free(cuccos);
+	return ans;
+}
+
+static float get_bett() {
 	int aux = 1;
 	char buff[30];
 	printf("Enter the amount of money you would like to bet.\n");

@@ -97,13 +97,13 @@ int main(int argc, char const * argv[]) {
 
 	database = smemory_open(8080); // TODO: define 8080
 	if(database == NULL) {
-		log_send(LEVEL_ERROR, "[MAIN SV] Can't reach the database.");
+		fprintf(stderr, "Can't reach the database.\n");
 		exit(EXIT_FAILURE);
 	}
 
 	connection = server_open(config_file);
 	if(connection == NULL) {
-		log_send(LEVEL_ERROR, "[MAIN SV] Can't create the main connection.");
+		fprintf(stderr, "Can't create the main connection.\n");
 		exit(EXIT_FAILURE);
 	}
 

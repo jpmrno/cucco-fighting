@@ -93,6 +93,8 @@ int main(int argc, char const * argv[]) {
 	if(connection == NULL) {
 		log_send(LEVEL_ERROR, "[MAIN SV] Can't create the main connection.");
 		exit(EXIT_FAILURE);
+	}else{
+		log_send(LEVEL_INFO, "[MAIN SV] Main connection created.");
 	}
 
 	signal(SIGINT, handle_int);

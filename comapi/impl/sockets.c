@@ -54,8 +54,6 @@ connection_t server_open(const char * config_file) {
 		return NULL;
 	}
 
-	printf("Tengo: %s:%d\n", config->ip, config->port);
-
 	connection = mkserver(config->ip, config->port);
 
 	config_free(config);
@@ -239,8 +237,6 @@ static config_t * config_new(const char * file) {
 		free(ip);
 		return NULL;
 	}
-
-	printf("Configured address: %s:%d\n", ip, port);
 
 	config = malloc(sizeof(config_t));
 	if(config == NULL) {

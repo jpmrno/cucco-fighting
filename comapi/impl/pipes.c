@@ -47,9 +47,6 @@ connection_t server_open(const char * config_file) {
 	if(config == NULL) {
 		return NULL;
 	}
-
-	printf("Tengo: %s\n", config->address);
-
 	connection = mkserver(config->address);
 
 	config_free(config);
@@ -84,11 +81,9 @@ connection_t server_accept(connection_t connection) {
 
 	strcpy(read_address, "/tmp/");
 
-	printf("Pido el write\n");
 	if(pipe_receive(network->read, (void *) write_address, PIPE_PATH_SIZE) == -1) {
 		return NULL;
 	}
-	printf("Tengo el write: %s\n", write_address);
 
 	write = pipe_open(write_address, TRUE);
 	if(write == NULL) {
@@ -107,7 +102,6 @@ connection_t server_accept(connection_t connection) {
 		pipe_remove(read);
 		return NULL;
 	}
-	printf("Cree el read: %s\n", read_address);
 
 	nnetwork = network_new(read, write);
 	if(nnetwork == NULL) {
@@ -115,7 +109,6 @@ connection_t server_accept(connection_t connection) {
 		pipe_remove(read);
 		return NULL;
 	}
-	printf("Cree la conexion\n");
 
 	return (connection_t) nnetwork;
 }
@@ -201,7 +194,6 @@ static connection_t cserver(char * address, ...) {
 	if(conector == NULL) {
 		return NULL;
 	}
-	printf("Pude conectar\n");
 
 	randstr(read_address + PIPE_DIR_SIZE, PIPE_NAME_SIZE);
 	read = pipe_make(read_address, FALSE);
@@ -209,7 +201,6 @@ static connection_t cserver(char * address, ...) {
 		pipe_close(conector);
 		return NULL;
 	}
-	printf("Cree el read: %s\n", read_address);
 
 	if(pipe_send(conector, (void *) read_address, PIPE_PATH_SIZE) == -1) {
 		pipe_close(conector);
@@ -229,7 +220,6 @@ static connection_t cserver(char * address, ...) {
 		pipe_remove(read);
 		return NULL;
 	}
-	printf("Abri: %s\n", write_address);
 
 	network = network_new(read, write);
 	if(network == NULL) {
@@ -238,7 +228,6 @@ static connection_t cserver(char * address, ...) {
 		pipe_close(write);
 		return NULL;
 	}
-	printf("Cree la conexion\n");
 
 	return (connection_t) network;
 }
@@ -258,8 +247,6 @@ static config_t * config_new(const char * file) {
 		free(address);
 		return NULL;
 	}
-
-	printf("Configured address: %s\n", address);
 
 	config = malloc(sizeof(config_t));
 	if(config == NULL) {

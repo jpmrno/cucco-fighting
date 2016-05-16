@@ -122,7 +122,7 @@ int bet(connection_t connection, double * wallet, int * clients, int * bettors, 
 		if(*bettors == *clients) {
 			printf("FIGHT INIT: %d/%d\n", *bettors, *clients);
 			*winner = "asd";
-			// TODO: fight();
+			// TODO: figth();
 		}
 		printf("BETTORS: %d\n", *bettors);
 		while(*winner == NULL);

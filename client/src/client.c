@@ -21,6 +21,7 @@ static void add_cucco();
 static void remove_cucco();
 static void place_bet();
 static void client_exit();
+static float get_bett();
 
 static connection_t connection = NULL;
 
@@ -42,17 +43,17 @@ int main(int argc, char const * argv[]) {
 			exit(EXIT_FAILURE);
 		}
 	}
+	
+	while(i++ < 2) {
+		intro();
+	}
 
 	connection = server_connect(config_file);
 	if(connection == NULL) {
-		fprintf(stderr, "No se pudo conectar al servidor.\n");
+		fprintf(stderr, "Couldnt connect to the server.\n");
 		exit(EXIT_FAILURE);
 	}
 	signal(SIGINT, handle_int);
-
-	while(i++ < 3) { // TODO: Nati gato
-		intro();
-	}
 
 	menu();
 	return 0;
@@ -61,7 +62,6 @@ int main(int argc, char const * argv[]) {
 static void menu() {
 	int alive = 1;
 	char buffer[256];
-
 	while(alive) {
 		printf("\nWhat would you like to do next?\n ");
 		printf("enter 'help' to see the possible options:\n\n");
@@ -74,7 +74,7 @@ static void menu() {
 		}else if (strcmp(buffer, "bet\n") == 0){
 			place_bet();
 
-		}else if(strcmp(buffer, "wallet\n") == 0){
+		}else if(strcmp(buffer, "wallet\n") == 0 || strcmp(buffer, "money") == 0){
 			print_money();
 
 		}else if(strcmp(buffer, "kaching\n") == 0){
@@ -89,8 +89,12 @@ static void menu() {
 		}else if(strcmp(buffer, "remove\n") == 0){
 			remove_cucco();
 
+		}else if(strcmp(buffer, "clear\n") == 0){
+			system("clear");
+			
 		}else if(strcmp(buffer, "exit\n")== 0){
 			alive = 0;
+			system("clear");
 			client_exit();
 		}else {
 			printf("Invalid command\n");
@@ -112,6 +116,7 @@ static void print_help() {
 	printf("-wallet: Get amount of money you have.\n");
 	printf("-kaching: Reset amount of money, to 50 cuccope$o$.\n");
 	printf("-help: See this menu.\n");
+	printf("-clear: Clear the screen.\n");
 	printf("-exit: Exit.\n");
 }
 
@@ -123,7 +128,7 @@ static void add_cucco() {
 	printf("\n%s\n", cucco);
 
 	if(cucco_add(connection, cucco) < OK) { // TODO: Cambiar de lugar
-		fprintf(stderr, "No se pudo cucco_add al servidor.\n");
+		fprintf(stderr, "The cucco could not be added.\n");
 		server_disconnect(connection);
 		exit(EXIT_FAILURE);
 	}
@@ -137,7 +142,7 @@ static void remove_cucco() {
 	printf("\n%s\n", cucco);
 
 	if(cucco_remove(connection, cucco) < OK) { // TODO: Cambiar de lugar
-		fprintf(stderr, "No se pudo cucco_remove al servidor.\n");
+		fprintf(stderr, "The cucco could not be removed.\n");
 		server_disconnect(connection);
 		exit(EXIT_FAILURE);
 	}
@@ -148,7 +153,7 @@ static void print_cuccos() {
 	int length, j;
 
 	if(list(connection, &cuccos, &length) < OK) { // TODO: Cambiar de lugar
-		fprintf(stderr, "No se pudo listear al servidor.\n");
+		fprintf(stderr, "The list of cuccos couldnt be obtained.\n");
 		server_disconnect(connection);
 		exit(EXIT_FAILURE);
 	}
@@ -163,7 +168,7 @@ static void print_money() {
 
 	wallet = money(connection);
 	if(wallet < 0) { // TODO: Cambiar de lugar
-		fprintf(stderr, "No se pudo monear al servidor.\n");
+		fprintf(stderr, "The amount of money couldnt be obtained.\n");
 		server_disconnect(connection);
 		exit(EXIT_FAILURE);
 	}
@@ -173,7 +178,7 @@ static void print_money() {
 
 static void reset_money() {
 	if(reset(connection) < OK) { // TODO: Cambiar de lugar
-		fprintf(stderr, "No se pudo resetear al servidor.\n");
+		fprintf(stderr, "The amount of money couldnt be set to its default value.\n");
 		server_disconnect(connection);
 		exit(EXIT_FAILURE);
 	}
@@ -191,14 +196,28 @@ static void reset_money() {
 
 static void place_bet() {
 	printf("Enter the name of the cucco you would like to place a bet on.\n");
-	char cucco[30];
-	bzero(cucco, 30);
-	fgets(cucco, 29, stdin);
-	printf("\n%s\n", cucco);
+	char cucco[50];
+	char c;
+	int i=0;
+	while((c=getchar()) != '\n'){
+		cucco[i++] = c;
+	}
+	cucco[i] = 0;
+	
+	float bett = get_bett();
+	int ret = bet(connection, cucco, bett);
+	if(!ret) {
+		fprintf(stderr, "The bet could not be placed.\n");
+		server_disconnect(connection);
+	}
+	print_money();
+}
 
+static float get_bett(){
 	int aux = 1;
 	char buff[30];
 	printf("Enter the amount of money you would like to bet.\n");
+	printf("Take into account that if you bet more money than what you have all your money will be bet.\n");
 	while(aux == 1){
 		int flag = 0;
 		int point = 0;
@@ -222,12 +241,7 @@ static void place_bet() {
 		}
 	}
 
-	float bett= atof(buff);
-	int ret = bet(connection, cucco, bett);
-	if(!ret) {
-		fprintf(stderr, "No se pudo bettear al servidor.\n");
-		server_disconnect(connection);
-	}
+	return atof(buff);
 }
 
 static void client_exit() {
@@ -244,16 +258,13 @@ static void handle_int(int sign) {
 	}
 }
 
-static void intro(){
+static void intro() {
 	int i = 0, count = 0;
 
 	while(i < 60) {
 		system("clear");
-		printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
-		printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
-		printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
-		printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
-
+		
+		printf("\n\n");
 		for(count = 0; count < i; count++){
 			printf(" ");
 		}
@@ -273,9 +284,16 @@ static void intro(){
 			printf(" ");
 		}
 		printf("   -'=   \n");
-
-		printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
+		
 		usleep(10500);
+		
 		i++;
 	}
+	
+	system("clear");
+	printf("    ___  __  __  ___  ___  _____    ____  ____  ___  _   _  ____ /\\\n");
+	printf("   / __)(  )(  )/ __)/ __)(  _  )  ( ___)(_  _)/ __)( )_( )(_  _))(\n");
+	printf("  ( (__  )(__)(( (__( (__  )(_)(    )__)  _)(_( (_-. ) _ (   )(  \\/\n");
+	printf("   \\___)(______)\\___)\\___)(_____)  (__)  (____)\\___/(_) (_) (__) ()\n\n\n");
+	printf("\n  \tBy: Juan Moreno, Francisco Bartolome, Natalia Navas\n\n");
 }

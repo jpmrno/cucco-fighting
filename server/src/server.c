@@ -15,13 +15,16 @@
 #include <time.h>
 #include <random.h>
 #include <server.h>
+#include <string.h>
 #include <semaphores.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 
 #define MONEY_DEFAULT 50
 
-#define SEM_SIZE 4
+#define SEM_SIZE 2
+
+#define MAX_SIZE 50
 
 static void handle_int(int sign);
 static int handle(connection_t connection);
@@ -29,7 +32,7 @@ static int run(connection_t connection, int op);
 
 static int * bettors;
 static int * clients;
-static char ** winner;
+static char * winner;
 
 static connection_t connection = NULL;
 static smemory_t database = NULL;
@@ -41,7 +44,7 @@ int server_sems = -1;
 int main(int argc, char const * argv[]) {
 	const char * config_file;
 	int connection_numer = 0, ret, pid;
-	short vals[SEM_SIZE] = {-1, -1, 0, -1};
+	short vals[SEM_SIZE] = {-1, -1};
 	// key_t key;
 
 	switch(argc) {
@@ -80,7 +83,7 @@ int main(int argc, char const * argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	winner = mmap(NULL, sizeof(*winner), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
+	winner = mmap(NULL, sizeof(*winner) * MAX_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(winner == MAP_FAILED) {
 		fprintf(stderr, "4 Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
@@ -88,7 +91,7 @@ int main(int argc, char const * argv[]) {
 
 	*bettors = 0;
 	*clients = 0;
-	*winner = NULL;
+	memset(winner, 0, sizeof(*winner) * MAX_SIZE);
 
 	if(!log_open()) {
 		fprintf(stderr, "Can't connect logging server.\n");
@@ -120,6 +123,7 @@ int main(int argc, char const * argv[]) {
 		}
 
 		connection_numer++;
+		(*clients)++;
 
 		pid = fork();
 		if(pid == -1) {

@@ -168,7 +168,7 @@ int list(connection_t connection, smemory_t database) {
 	return !(ret < OK);
 }
 
-int bet(connection_t connection, double * wallet, int * clients, int * bettors, char ** winner, smemory_t database) {
+int bet(connection_t connection, double * wallet, int * clients, int * bettors, char * winner, smemory_t database) {
 	char * cucco;
 	double money;
 	int ret;
@@ -179,49 +179,31 @@ int bet(connection_t connection, double * wallet, int * clients, int * bettors, 
 		return FALSE;
 	}
 
-	printf("(BET) -> %f to %s\n", money, cucco);
-
 	if(money > *wallet) {
 		money = *wallet;
 	}
 
 	if(*bettors == 0) {
-		*winner = NULL;
+		strcpy(winner, fight(database));
 	}
 
 	sem_lock(server_sems, 0);
 	(*bettors)++;
 	sem_unlock(server_sems, 0);
-	printf("BETTORS: %d/%d\n", *bettors, *clients);
-	if(*bettors == *clients) {
-		printf("FIGHT INIT: %d/%d\n", *bettors, *clients);
-		*winner = fight(database);
-		if(*winner == NULL) {
-			return FALSE;
-		}
-		sem_unlock(server_sems, 2); // Libero al resto de los clientes
-	} else {
-		printf("(%d) PIDO EL LOCK\n", 2);
-		ret = sem_lock(server_sems, 2); // Espero al resto de los clientes
-		printf("(%d) TENGO EL LOCK\n", 2);
-	}
 
-	printf("(%d) PIDO EL LOCK\n", 0);
-	sem_lock(server_sems, 0);
-	printf("(%d) TENGO EL LOCK\n", 0);
-	(*bettors)--;
-	sem_unlock(server_sems, 0);
+	while(*bettors != *clients);
 
-	printf("(%d) PIDO EL LOCK\n", 3);
-	printf("(%d) TENGO EL LOCK\n", 3);
-	if(!strcmp(cucco, *winner)) {
+	if(!strcmp(cucco, winner)) {
 		(*wallet) = (*wallet) + money;
 	} else {
 		(*wallet) = (*wallet) - money;
 	}
 
-	ret = !(write_s(connection, *winner) < OK);
-	printf("TERMINE\n");
+	ret = !(write_s(connection, winner) < OK);
+
+	sem_lock(server_sems, 0);
+	(*bettors)--;
+	sem_unlock(server_sems, 0);
 
 	return ret;
 }

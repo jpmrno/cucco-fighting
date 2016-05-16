@@ -123,7 +123,6 @@ int main(int argc, char const * argv[]) {
 		}
 
 		connection_numer++;
-		(*clients)++;
 
 		pid = fork();
 		if(pid == -1) {

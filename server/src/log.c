@@ -15,8 +15,6 @@ static mqueue_t mq = NULL;
 int log_open() {
 	key_t key = ftok("database.sql", KEY_ID);
 
-	printf("LOG KEY: %d\n", key);
-
 	mq = mq_open(key);
 
 	if(mq == NULL) {

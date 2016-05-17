@@ -17,6 +17,7 @@
 #include <server.h>
 #include <string.h>
 #include <semaphores.h>
+#include <sys/ipc.h>
 
 #define CONFIG_FILE_DEFAULT "config.ini"
 
@@ -25,6 +26,9 @@
 #define SEM_SIZE 2
 
 #define MAX_SIZE 50
+
+#define KEY_ID 2
+#define KEY_DB_ID 1
 
 static void handle_int(int sign);
 static int handle(connection_t connection);
@@ -45,7 +49,8 @@ int main(int argc, char const * argv[]) {
 	const char * config_file;
 	int connection_numer = 0, ret, pid;
 	short vals[SEM_SIZE] = {1, 1};
-	// key_t key;
+	key_t key = ftok("database.sql", KEY_ID);
+	key_t key_db = ftok("database.sql", KEY_DB_ID);
 
 	switch(argc) {
 		case 1: {
@@ -64,12 +69,11 @@ int main(int argc, char const * argv[]) {
 
 	pcg32_srandom(time(NULL), (intptr_t)&connection_numer);
 
-	server_sems = sem_make(1117, SEM_SIZE, vals);
+	server_sems = sem_make(key, SEM_SIZE, vals);
 	if(server_sems == -1) {
 		fprintf(stderr, "1 Can't create neccessary data to operate.\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("LOCK: %d\n", server_sems);
 
 	bettors = mmap(NULL, sizeof(*bettors), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANON, -1, 0);
 	if(bettors == MAP_FAILED) {
@@ -98,7 +102,7 @@ int main(int argc, char const * argv[]) {
 		//exit(EXIT_FAILURE);
 	}
 
-	database = smemory_open(8080); // TODO: define 8080
+	database = smemory_open(key_db); // TODO: define 8080
 	if(database == NULL) {
 		fprintf(stderr, "Can't reach the database.\n");
 		exit(EXIT_FAILURE);

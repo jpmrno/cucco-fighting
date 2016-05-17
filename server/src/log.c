@@ -10,8 +10,14 @@
 static char * level_string(level_t level);
 static mqueue_t mq = NULL;
 
-int log_open(){
-	mq = mq_open(1234); // TODO: Define 1234
+#define KEY_ID 3
+
+int log_open() {
+	key_t key = ftok("database.sql", KEY_ID);
+
+	printf("LOG KEY: %d\n", key);
+
+	mq = mq_open(key);
 
 	if(mq == NULL) {
 		return FALSE;
@@ -20,13 +26,13 @@ int log_open(){
 	return TRUE;
 }
 
-int log_send(level_t level, char * message){
+int log_send(level_t level, char * message) {
 	qmessage_t * msg = malloc(sizeof(qmessage_t));
 
 	if(msg == NULL) {
 		return FALSE;
 	}
-	
+
 	if(mq == NULL) {
 		printf("%s: %s\n", level_string(level), message);
 		return TRUE;
@@ -48,14 +54,15 @@ void log_close() {
 static char * level_string(level_t level) {
 	switch(level) {
 		case LEVEL_INFO:
-			return "Info:";
+			return "Info";
 			break;
 		case LEVEL_WARNING:
 			return "Warning";
 			break;
 		case LEVEL_ERROR:
-			return "Error: ";
+			return "Error";
 			break;
 	}
+
 	return "";
 }

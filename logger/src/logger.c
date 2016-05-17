@@ -5,6 +5,9 @@
 #include <strings.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <sys/ipc.h>
+
+#define KEY_ID 3
 
 #define USAGE_STRING "Usage: 'logger.app <stdout/file> [file_path]'.\n"
 
@@ -20,6 +23,7 @@ static FILE * fp = NULL;
 
 int main(int argc, char const * argv[]) {
 	const char * file_path;
+	key_t key = ftok("database.sql", KEY_ID);
 
 	switch(argc) {
 		case 2: {
@@ -50,7 +54,7 @@ int main(int argc, char const * argv[]) {
 		printf("FILE: %s\n", file_path);
 	}
 
-	mqueue = mq_make(1234);
+	mqueue = mq_make(key);
 	if(mqueue == NULL) {
 		fprintf(stderr, "No se pudo crear la message queue.");
 		exit(EXIT_FAILURE);

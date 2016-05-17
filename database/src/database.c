@@ -7,8 +7,11 @@
 #include <signal.h>
 #include <dbsvlib.h>
 #include <tpl.h>
+#include <sys/ipc.h>
 
 #define DATABASE_PATH_DEFAULT "database.sql"
+
+#define KEY_ID 1
 
 static void handle_int(int sign);
 static int handle(void * buffer, size_t size);
@@ -29,6 +32,7 @@ int main(int argc, char const * argv[]) {
 	void * buffer;
 	size_t size;
 	int ret = 0;
+	key_t key = ftok("database.sql", KEY_ID);
 
 	switch(argc) {
 		case 1: {
@@ -51,7 +55,7 @@ int main(int argc, char const * argv[]) {
 		exit(EXIT_FAILURE);
 	}
 
-	server = smemory_make(8080); // TODO: define 8080
+	server = smemory_make(key); // TODO: define 8080
 	if(server == NULL) {
 		fprintf(stderr, "Can't create the main connection.\n");
 		exit(EXIT_FAILURE);
@@ -60,8 +64,12 @@ int main(int argc, char const * argv[]) {
 	signal(SIGINT, handle_int);
 
 	while(!ret) {
-		smemory_read(server, &buffer, &size);
-		ret = handle(buffer, size);
+		if(smemory_read(server, &buffer, &size)) {
+			ret = handle(buffer, size);
+		} else {
+			fprintf(stderr, "Error while reading from shared memory.\n");
+			ret = -1;
+		}
 	}
 
 	smemory_remove(server);
@@ -74,13 +82,14 @@ static void handle_int(int sign) {
 	if(sign == SIGINT) {
 		smemory_remove(server);
 		database_close(database);
+		exit(EXIT_FAILURE);
 	}
 }
 
 static int handle(void * buffer, size_t size) {
-	tpl_node * node;
+	tpl_node * node = NULL;
 	int op, ret;
-	char * cucco;
+	char * cucco = NULL;
 
 	if(!get(buffer, size, &op, &cucco)) {
 		return -1;
@@ -90,7 +99,9 @@ static int handle(void * buffer, size_t size) {
 		case DB_GET: {
 			node = tpl_map("A(s)", &resp_aux);
 			ret = database_cuccos_get(database, cucco, callback, node);
-			tpl_dump(node, TPL_MEM, &resp_buffer, &resp_size);
+			if(ret) {
+				tpl_dump(node, TPL_MEM, &resp_buffer, &resp_size);
+			}
 			tpl_free(node);
 		} break;
 
@@ -107,7 +118,9 @@ static int handle(void * buffer, size_t size) {
 		case DB_LIST: {
 			node = tpl_map("A(s)", &resp_aux);
 			ret = database_cuccos_list(database, callback, node);
-			tpl_dump(node, TPL_MEM, &resp_buffer, &resp_size);
+			if(ret) {
+				tpl_dump(node, TPL_MEM, &resp_buffer, &resp_size);
+			}
 			tpl_free(node);
 		} break;
 
@@ -133,10 +146,11 @@ static int handle(void * buffer, size_t size) {
 }
 
 static int get(void * buffer, int size, int * op, char ** name) {
-	tpl_node * node;
+	tpl_node * node = NULL;
 
 	node = tpl_map("is", op, name);
 	if(tpl_load(node, TPL_MEM, buffer, size) == -1) {
+		tpl_free(node);
 		return FALSE;
 	}
 	tpl_unpack(node, 0);
